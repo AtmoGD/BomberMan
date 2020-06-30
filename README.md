@@ -1,6 +1,30 @@
 # Bomber Man
 
+## Idea
+I want to make a **Bomber Man** clone.
 
+The Player starts on a map whith randomly generated Boxes. These Boxes are destroyable with the bombs the player can place.
+
+The map also generates enemys and power-ups. 
+
+Enemys will try to kill the player with their bombs and power-ups will cause that the player can place bombs faster or the placed bombs has a higher kill range. Also there can spawn live power-ups. They will add a live to the player.
+
+If the Player kills an enemy, the player will gain score and a new enemy will be spawned.
+The game is over once the player has lost all his three lives.
+
+### Controlling
+You can controll the player with the `W` `A` `S` `D` buttons on your keyboard. With `Space` you can place a Bomb.
+
+## UI Scribble
+![Scribble](./Concept/Scribble.jpg "UI Scribble")
+
+## Use-case diagramm
+ ![Scribble](./Concept/UseCase.jpg "Use-case diagramm")
+
+## Class-diagramm
+
+### Bomber Man
+![Scribble](./Concept/BomberMan.svg "Use-case diagramm")
 
 ## Checkliste für Leistungsnachweis
 © Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl, HFU

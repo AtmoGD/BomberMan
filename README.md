@@ -13,7 +13,7 @@ If the Player kills an enemy, the player will gain score and a new enemy will be
 The game is over once the player has lost all his three lives.
 
 ### Controlling
-You can controll the player with the `W` `A` `S` `D` buttons on your keyboard. With `Space` you can place a Bomb.
+You can controll the player with the `W` `A` `S` `D` buttons on your keyboard for the movement and with `Space` to place a Bomb.
 
 ## UI Scribble
 ![Scribble](./Concept/Scribble.jpg "UI Scribble")

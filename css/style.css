@@ -16,7 +16,7 @@ canvas {
 
 #overlay {
   position: fixed;
-  background-image: url("./assets/img/Bomberman_BG.png");
+  background-image: url("../assets/img/Bomberman_BG.png");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

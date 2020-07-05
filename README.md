@@ -19,21 +19,22 @@ You can controll the player with the `W` `A` `S` `D` buttons on your keyboard fo
 ![Scribble](./Concept/Scribble.jpg "UI Scribble")
 
 ## Use-case diagramm
- ![Scribble](./Concept/UseCase.jpg "Use-case diagramm")
+ ![Use Case](./Concept/UseCase.jpg "Use-case diagramm")
 
 ## Class-diagramm
+![Class Diagram](./Concept/BomberManClassDiagram.svg "Class diagram")
 
-### Bomber Man
-![Scribble](./Concept/BomberMan.svg "Use-case diagramm")
+## Activity-diagramm
+![Activity Diagram](./Concept/BomberManActivityDiagram.svg "Activity diagram")
 
 ## Checkliste für Leistungsnachweis
 © Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl, HFU
 
 | Nr | Bezeichnung           | Inhalt                                                                                                                                                                                                                                                                         |
 |---:|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|    | Titel                 |
-|    | Name                  |
-|    | Matrikelnummer        |
+|    | Titel                 | Bomber Man
+|    | Name                  | Dennis Hawran
+|    | Matrikelnummer        | 262357
 |  1 | Nutzerinteraktion     | Der Nutzer kann mit der Applikation interagieren. Mit welchen Mitteln und welchen Aktionen werden welche Reaktionen ausgelöst?                                                                                                                                                 |
 |  2 | Objektinteraktion     | Mit Hilfe von Kollisionsprüfung interagieren Objekte miteinander. Wann passiert dabei wie was?                                                                                                                                                                                 |
 |  3 | Objektanzahl variabel | Eine variable Anzahl von Objekten wird zur Laufzeit generiert. Welche sind dies und wann und wie geschieht die Erzeugung?                                                                                                                                                      |

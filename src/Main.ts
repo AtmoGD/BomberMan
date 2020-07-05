@@ -1,4 +1,5 @@
 namespace BomberMan {
+
   window.addEventListener("load", handleLoad);
 
   function handleLoad(): void {
@@ -9,7 +10,13 @@ namespace BomberMan {
       return;
 
     switch (page) {
-      
+      case "index.html":
+        initStartScreen();
+        break;
+      case "Game.html":
+        break;
+      default:
+        return;
     }
   }
 }

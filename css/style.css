@@ -13,6 +13,12 @@ body {
   background-color: rgb(212, 206, 206);
 }
 
+#controllDiv {
+  width: 15em;
+  display: flex;
+  flex-direction: column;
+}
+
 main {
   display: flex;
   flex-direction: column;

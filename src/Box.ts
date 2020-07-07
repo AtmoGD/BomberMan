@@ -1,8 +1,8 @@
 namespace BomberMan {
-  export class Box extends Destroyable{
+  export class Box extends Destroyable {
 
-    public die(): void {
-
+    constructor() {
+      super("Box");
     }
   }
 }

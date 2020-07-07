@@ -1,6 +1,7 @@
 namespace BomberMan {
 
   export import ƒ = FudgeCore;
+  export import ƒAid = FudgeAid;
 
   window.addEventListener("load", handleLoad);
 
@@ -16,6 +17,7 @@ namespace BomberMan {
         initStartScreen();
         break;
       case "Game.html":
+        initGame();
         break;
       default:
         return;

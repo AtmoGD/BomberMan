@@ -1,5 +1,7 @@
 namespace BomberMan {
 
+  export import ƒ = FudgeCore;
+
   window.addEventListener("load", handleLoad);
 
   function handleLoad(): void {

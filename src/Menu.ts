@@ -20,7 +20,7 @@ namespace BomberMan {
   }
 
   function startGame(): void {
-    window.location.href = "./html/Game.html";
+    window.location.href = "./html/Game.html"; 
   }
 
   function updateVolume(): void {

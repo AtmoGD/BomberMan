@@ -7,6 +7,7 @@ var BomberMan;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
+    BomberMan.ƒ = FudgeCore;
     window.addEventListener("load", handleLoad);
     function handleLoad() {
         let path = window.location.pathname;
@@ -79,5 +80,23 @@ var BomberMan;
         document.cookie = _name + "=" + "; expires=" + date.toUTCString() + "; path=/";
     }
     BomberMan.deleteCookie = deleteCookie;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
+    class Box {
+    }
+    BomberMan.Box = Box;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
+    class Destroyable extends BomberMan.ƒ.Node {
+        constructor() {
+            super("Destroyable");
+        }
+        checkCollision(_position) {
+            return this.mtxLocal.translation.isInsideSphere(_position, 1);
+        }
+    }
+    BomberMan.Destroyable = Destroyable;
 })(BomberMan || (BomberMan = {}));
 //# sourceMappingURL=Main.js.map

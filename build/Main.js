@@ -1,6 +1,26 @@
 "use strict";
 var BomberMan;
 (function (BomberMan) {
+    class Box extends BomberMan.Destroyable {
+        die() {
+        }
+    }
+    BomberMan.Box = Box;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
+    class Destroyable extends BomberMan.ƒ.Node {
+        constructor() {
+            super("Destroyable");
+        }
+        checkCollision(_position) {
+            return this.mtxLocal.translation.isInsideSphere(_position, 1);
+        }
+    }
+    BomberMan.Destroyable = Destroyable;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
     function createGameManager() {
     }
     BomberMan.createGameManager = createGameManager;
@@ -80,23 +100,5 @@ var BomberMan;
         document.cookie = _name + "=" + "; expires=" + date.toUTCString() + "; path=/";
     }
     BomberMan.deleteCookie = deleteCookie;
-})(BomberMan || (BomberMan = {}));
-var BomberMan;
-(function (BomberMan) {
-    class Box {
-    }
-    BomberMan.Box = Box;
-})(BomberMan || (BomberMan = {}));
-var BomberMan;
-(function (BomberMan) {
-    class Destroyable extends BomberMan.ƒ.Node {
-        constructor() {
-            super("Destroyable");
-        }
-        checkCollision(_position) {
-            return this.mtxLocal.translation.isInsideSphere(_position, 1);
-        }
-    }
-    BomberMan.Destroyable = Destroyable;
 })(BomberMan || (BomberMan = {}));
 //# sourceMappingURL=Main.js.map

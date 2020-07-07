@@ -1,5 +1,4 @@
 namespace BomberMan {
-
   export abstract class Destroyable extends ƒ.Node {
     
     constructor() {

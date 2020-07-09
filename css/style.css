@@ -92,7 +92,7 @@
 
 /*region Game*/
   #backgroundGame {
-    background-color: gray;
+    background-image: url("../assets/img/Bomberman_Game_Background.jpg");
   }
 
   #gameDiv {
@@ -104,13 +104,41 @@
     justify-content: center;
   }
 
+  #gameDiv h1 {
+    font-size: 350%;
+  }
   .overlay {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     position: absolute;
     width: 90vw;
     height: 80vh;
-    margin-top: 2em;
+    margin-top: 3em;
     background-color: transparent;
+  }
+
+  #startGame {
+    width: 50%;
+    height: 10%;
+    background-color: transparent;
+    color: white;
+    border: 15px, solid white;
+    border-radius: 5px;
+    font-size: 300%;
+  }
+
+  #startOverlay {
+
+  }
+
+  #gameOverlay {
+    display: none;
+  }
+
+  #gameOverOverlay {
+    display: none;
   }
 
   canvas {

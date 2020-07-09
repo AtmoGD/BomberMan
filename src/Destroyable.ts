@@ -1,3 +1,4 @@
+///<reference path="Main.ts"/>
 namespace BomberMan {
   export class Destroyable extends ƒ.Node {
     

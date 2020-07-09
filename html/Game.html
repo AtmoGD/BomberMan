@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +9,19 @@
   <script src="../build/Main.js"></script>
   <title>Bomber Man - Game</title>
 </head>
+
 <body>
-  <div id="overlay">
-    <h1>Bomber Man</h1>
+  <div id="backgroundGame">
+    <div id="gameDiv">
+      <h1>Bomber Man</h1>
+      <span class="smallSpace"></span>
+      <canvas>
+      </canvas>
+      <div id="startOverlay" class="overlay"></div>
+      <div id="gameOverlay" class="overlay"></div>
+      <div id="gameOverOverlay" class="overlay"></div>
+    </div>
   </div>
-  <canvas>
-  </canvas>
 </body>
+
 </html>

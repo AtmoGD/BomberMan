@@ -4,14 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./css/style.css">
+  <script src="./Fudge/FudgeCore.js"></script>
   <script src="./build/Main.js"></script>
   <title>Bomber Man - Start</title>
 </head>
-<body>
+<body id="menu">
   <main>
-    <div id="controllDiv">
-      <button id="startGameButton">Start Game</button>
-      <input type="range" name="volume" id="volumeInput">
+    <div id="backgroundMenu">
+      <div id="controllDiv">
+        <button id="startGameButton">Start Game</button><br/>
+        <span class="space"></span>
+        <label for="volumeInput">Volume</label>
+        <span class="smallSpace"></span>
+        <input type="range" name="volume" id="volumeInput">
+      </div>
     </div>
   </main>
 </body>

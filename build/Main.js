@@ -90,6 +90,10 @@ var BomberMan;
     let viewport;
     let graph;
     let gameManager;
+    let startOverlay;
+    let gameOverlay;
+    let gameOverOverlay;
+    let startButton;
     function initGame() {
         camera = new BomberMan.ƒ.ComponentCamera();
         camera.pivot.translateZ(BomberMan.Data.cameraDistance);
@@ -100,22 +104,39 @@ var BomberMan;
         viewport.initialize("Viewport", graph, camera, canvas);
         viewport.draw();
         gameManager = new BomberMan.GameManager(viewport, graph);
-        gameManager.startGame();
+        getReferences();
+        installEventListener();
     }
     BomberMan.initGame = initGame;
+    function getReferences() {
+        startOverlay = document.querySelector("#startOverlay");
+        gameOverlay = document.querySelector("#gameOverlay");
+        gameOverOverlay = document.querySelector("#gameOverOverlay");
+        startButton = document.querySelector("#startButton");
+    }
+    function installEventListener() {
+        startButton.addEventListener("click", startGame);
+    }
+    function startGame() {
+        startOverlay.style.display = "none";
+        gameOverlay.style.display = "flex";
+        gameOverOverlay.style.display = "none";
+        gameManager.startGame();
+    }
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
     class GameManager {
         constructor(_viewport, _graph) {
+            this.map = null;
             this.destroyables = [];
             this.gameOver = false;
             this.viewport = _viewport;
             this.graph = _graph;
         }
         startGame() {
-            let bomberMan = new BomberMan.BomberMan();
-            this.destroyables.push(bomberMan);
+            this.map = BomberMan.MapGenerator.generateWorld();
+            this.graph.appendChild(this.map);
             BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
             BomberMan.ƒ.Loop.start(BomberMan.Data.loopMode, BomberMan.Data.fps);
         }
@@ -123,6 +144,24 @@ var BomberMan;
         }
     }
     BomberMan.GameManager = GameManager;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
+    class Map extends BomberMan.ƒ.Node {
+        constructor() {
+            super("Map");
+        }
+    }
+    BomberMan.Map = Map;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
+    class MapGenerator {
+        static generateWorld() {
+            return new BomberMan.Map();
+        }
+    }
+    BomberMan.MapGenerator = MapGenerator;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {

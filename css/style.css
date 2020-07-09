@@ -49,6 +49,10 @@
     background: #000;
     cursor: pointer;
   }
+
+  .src {
+    display: none;
+  }
 /*#endregion */
 
 /*#region Menu*/
@@ -81,6 +85,11 @@
     height: 20%;
     width: 80%;
     background-color: transparent;
+  }
+
+  #startGameButton:hover, #startButton:hover{
+    color: white;
+    background-color: rgba(1, 1, 1, 0.8);
   }
 
   #volumeInput {

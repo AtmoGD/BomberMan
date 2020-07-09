@@ -12,7 +12,6 @@ namespace BomberMan {
       volumeInput.addEventListener("change", updateVolume);
 
       let volume: string | undefined= getCookie("Volume");
-      console.log(document.cookie);
       if (volume != undefined) {
         volumeInput.value = volume;
       }

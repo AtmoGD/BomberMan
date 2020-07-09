@@ -2,12 +2,15 @@
 var BomberMan;
 (function (BomberMan) {
     BomberMan.ƒ = FudgeCore;
+    BomberMan.ƒAid = FudgeAid;
     window.addEventListener("load", handleLoad);
     function handleLoad() {
         let path = window.location.pathname;
         let page = path.split("/").pop();
-        if (!page)
+        if (!page) {
+            BomberMan.initStartScreen();
             return;
+        }
         switch (page) {
             case "index.html":
                 BomberMan.initStartScreen();
@@ -94,20 +97,27 @@ var BomberMan;
     let gameOverlay;
     let gameOverOverlay;
     let startButton;
+    BomberMan.ƒ.RenderManager.initialize(true, true);
     function initGame() {
+        getReferences();
+        installEventListener();
         camera = new BomberMan.ƒ.ComponentCamera();
         camera.pivot.translateZ(BomberMan.Data.cameraDistance);
-        camera.pivot.rotateY(180);
+        let cameraLookAt = new BomberMan.ƒ.Vector3(0, 0, 0);
+        camera.pivot.lookAt(cameraLookAt);
         graph = new BomberMan.ƒ.Node("Graph");
         const canvas = document.querySelector("canvas");
         viewport = new BomberMan.ƒ.Viewport();
         viewport.initialize("Viewport", graph, camera, canvas);
-        viewport.draw();
         gameManager = new BomberMan.GameManager(viewport, graph);
-        getReferences();
-        installEventListener();
+        viewport.draw();
+        BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
+        BomberMan.ƒ.Loop.start(BomberMan.Data.loopMode, BomberMan.Data.fps);
     }
     BomberMan.initGame = initGame;
+    function update() {
+        viewport.draw();
+    }
     function getReferences() {
         startOverlay = document.querySelector("#startOverlay");
         gameOverlay = document.querySelector("#gameOverlay");
@@ -137,28 +147,115 @@ var BomberMan;
         startGame() {
             this.map = BomberMan.MapGenerator.generateWorld();
             this.graph.appendChild(this.map);
-            BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
-            BomberMan.ƒ.Loop.start(BomberMan.Data.loopMode, BomberMan.Data.fps);
+            for (let node of this.graph.getChildren()) {
+                console.log(node);
+            }
         }
-        update() {
+        getMap() {
+            return this.map;
         }
     }
     BomberMan.GameManager = GameManager;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
-    class Map extends BomberMan.ƒ.Node {
-        constructor() {
+    class Map extends BomberMan.ƒAid.Node {
+        constructor(_data) {
             super("Map");
+            Map.loadImages();
+            this.data = _data;
+            this.generateMap();
+        }
+        generateMap() {
+            for (let x = 0; x <= this.data.length; x++) {
+                for (let y = 0; y < this.data[0].length; y++) {
+                    let pos = new BomberMan.ƒ.Vector3(x, y, 0);
+                    this.appendChild(this.createTerrainNode(Map.floorImg));
+                }
+            }
+        }
+        createFloor(_position) {
+            let floor = new BomberMan.ƒ.Node("Floor");
+            // let groundMesh: ƒ.MeshQuad = new ƒ.MeshQuad();
+            // let groundMeshComp: ƒ.ComponentMesh = new ƒ.ComponentMesh(groundMesh);
+            // groundMeshComp.pivot.scaleY(30);
+            // groundMeshComp.pivot.scaleX(30);
+            // let groundIMG: HTMLImageElement = <HTMLImageElement>document.getElementById("ground");
+            // let groundTextureIMG: ƒ.TextureImage = new ƒ.TextureImage();
+            // groundTextureIMG.image = groundIMG;
+            // let groundTextureCoat: ƒ.CoatTextured = new ƒ.CoatTextured();
+            // groundTextureCoat.texture = groundTextureIMG;
+            // groundTextureCoat.repetition = true;
+            // groundTextureCoat.tilingX = 30;
+            // groundTextureCoat.tilingY = 30;
+            // let groundMaterial: ƒ.Material = new ƒ.Material("ground", ƒ.ShaderTexture, groundTextureCoat);
+            // let groundComponentMat: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(groundMaterial);
+            // let groundTransformComp: ƒ.ComponentTransform = new ƒ.ComponentTransform(
+            //   ƒ.Matrix4x4.TRANSLATION(new ƒ.Vector3(0, 0, -1)))
+            // floor.addComponent(groundTransformComp);
+            // floor.addComponent(groundMeshComp);
+            // floor.addComponent(groundComponentMat);
+            // return floor;
+            let cmpTransform = new BomberMan.ƒ.ComponentTransform();
+            cmpTransform.local.translate(new BomberMan.ƒ.Vector3(_position.x, _position.y, 0));
+            let mesh = new BomberMan.ƒ.MeshCube();
+            let cmpMesh = new BomberMan.ƒ.ComponentMesh(mesh);
+            let material = new BomberMan.ƒ.Material("SolidWhite", BomberMan.ƒ.ShaderFlat, new BomberMan.ƒ.CoatColored(BomberMan.ƒ.Color.CSS("WHITE")));
+            let cmpMaterial = new BomberMan.ƒ.ComponentMaterial(material);
+            floor.addComponent(cmpTransform);
+            floor.addComponent(cmpMesh);
+            floor.addComponent(cmpMaterial);
+            console.log("Here");
+            return floor;
+        }
+        static loadImages() {
+            Map.floorImg = document.querySelector("#floor");
+        }
+        createTerrainNode(_img) {
+            let txt = new BomberMan.ƒ.TextureImage();
+            let coat = new BomberMan.ƒ.CoatTextured();
+            txt.image = _img;
+            coat.texture = txt;
+            let mesh = new BomberMan.ƒ.MeshSprite();
+            let mtr = new BomberMan.ƒ.Material("mtrTerrain", BomberMan.ƒ.ShaderTexture, coat);
+            let terrain = new BomberMan.ƒAid.Node("Terrain", BomberMan.ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+            let terrainsCmpMesh = terrain.getComponent(BomberMan.ƒ.ComponentMesh);
+            terrainsCmpMesh.pivot.scale(new BomberMan.ƒ.Vector3(20, 20, 0));
+            return terrain;
+        }
+        getTextureMaterial(_name, _img) {
+            let txt = new BomberMan.ƒ.TextureImage();
+            let coatTxt = new BomberMan.ƒ.CoatTextured();
+            txt.image = _img;
+            coatTxt.texture = txt;
+            return new BomberMan.ƒ.Material(_name, BomberMan.ƒ.ShaderTexture, coatTxt);
+        }
+        createGround() {
+            let floor = new BomberMan.ƒ.Node("Floor");
+            return floor;
+        }
+        createBox() {
+            let floor = new BomberMan.ƒ.Node("Floor");
+            return floor;
         }
     }
     BomberMan.Map = Map;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
+    BomberMan.firstMap = [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+    ];
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
     class MapGenerator {
         static generateWorld() {
-            return new BomberMan.Map();
+            return new BomberMan.Map(BomberMan.firstMap);
         }
     }
     BomberMan.MapGenerator = MapGenerator;
@@ -175,7 +272,6 @@ var BomberMan;
         if (volumeInput) {
             volumeInput.addEventListener("change", updateVolume);
             let volume = BomberMan.getCookie("Volume");
-            console.log(document.cookie);
             if (volume != undefined) {
                 volumeInput.value = volume;
             }

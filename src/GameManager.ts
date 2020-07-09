@@ -17,12 +17,13 @@ namespace BomberMan {
       this.map = MapGenerator.generateWorld();
       this.graph.appendChild(this.map);
       
-      ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.update);
-      ƒ.Loop.start(Data.loopMode, Data.fps);
+      for (let node of this.graph.getChildren()) {
+        console.log(node);
+      }
     }
 
-    private update(): void {
-
+    public getMap(): Map {
+      return this.map;
     }
   }
 }

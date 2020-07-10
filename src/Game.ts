@@ -21,6 +21,7 @@ namespace BomberMan {
 
     camera = new ƒ.ComponentCamera();
     camera.pivot.translateZ(Data.cameraDistance);
+    camera.pivot.rotateY(180);
 
     let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
     camera.pivot.lookAt(cameraLookAt);
@@ -33,6 +34,9 @@ namespace BomberMan {
 
     gameManager = new GameManager(viewport, graph);
     viewport.draw();
+
+    let gizmo = new ƒAid.NodeCoordinateSystem("ControlSystem");
+    graph.addChild(gizmo);
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(Data.loopMode, Data.fps);

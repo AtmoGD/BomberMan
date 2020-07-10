@@ -1,89 +1,97 @@
 namespace BomberMan {
   export class Map extends ƒAid.Node {
-    public static floorImg: HTMLImageElement;
+    public static grasImg: HTMLImageElement;
+    public static boxImg: HTMLImageElement;
+    public static wallsImg: HTMLImageElement;
+    public static walltImg: HTMLImageElement;
 
     private data: number[][];
+    private mapElements: ƒAid.Node[][] = [];
 
     constructor(_data: number[][]) {
       super("Map");
-      Map.loadImages();
 
       this.data = _data;
+
+      for (let i: number = 0; i < this.data[0].length; i++)
+        this.mapElements[i] = [];
+      
       this.generateMap();
     }
 
     private generateMap(): void {
-      for (let x: number = 0; x <= this.data.length; x++) {
-        for (let y: number = 0; y < this.data[0].length; y++) {
-          let pos: ƒ.Vector3 = new ƒ.Vector3(x, y, 0);
-          this.appendChild(this.createTerrainNode(Map.floorImg));
+      // <-------------------------------------------TODO make map appear in middle--------->
+      for (let y: number = 0; y < this.data.length; y++) {
+        for (let x: number = 0; x < this.data[y].length; x++) {
+          let pos: ƒ.Vector3 = new ƒ.Vector3(x - (this.data[0].length / 2) + 0.5, -(y - (this.data.length / 2) + 0.5), 0);
+          this.createTile(y, x, pos);
         }
       }
-
     }
 
-    private createFloor(_position: ƒ.Vector2): ƒ.Node {
+    public static loadImages(): void {
+      Map.grasImg = document.querySelector("#gras");
+      Map.boxImg = document.querySelector("#box");
+      Map.wallsImg = document.querySelector("#walls");
+      Map.walltImg = document.querySelector("#wallt");
+    }
+
+    private createTile(_y: number, _x: number, _pos: ƒ.Vector3) {
+      let tile: ƒAid.Node = null;
+      switch (this.data[_y][_x]) {
+        case 0:
+          tile = this.createGras(_pos);
+          break;
+        case 1:
+          tile = this.createWallTop(_pos);
+          break;
+        case 2:
+          break;
+        case 3:
+          break;
+        default:
+          break;
+      }
+
+      if (tile) {
+        this.appendChild(tile);
+        this.mapElements[_y][_x] = tile;
+      }
+    }
+    public createGras(_pos: ƒ.Vector3): ƒAid.Node {
+      let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
+      let mtr: ƒ.Material = this.getTextureMaterial("Gras", Map.grasImg);
+
+      let gras: ƒAid.Node = new ƒAid.Node("gras", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+
+      let cmpTransform: ƒ.ComponentTransform = gras.getComponent(ƒ.ComponentTransform);
+      cmpTransform.local.translate(_pos);
+
+      return gras;
+    }
+
+    public createWallTop(_pos: ƒ.Vector3): ƒAid.Node {
+      let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
+      let mtr: ƒ.Material = this.getTextureMaterial("WallTop", Map.walltImg);
+
+      let wallt: ƒAid.Node = new ƒAid.Node("gras", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+
+      let cmpTransform: ƒ.ComponentTransform = wallt.getComponent(ƒ.ComponentTransform);
+      cmpTransform.local.translate(_pos);
+
+      return wallt;
+    }
+
+
+    private createBox(): ƒ.Node {
       let floor: ƒ.Node = new ƒ.Node("Floor");
-
-      // let groundMesh: ƒ.MeshQuad = new ƒ.MeshQuad();
-      // let groundMeshComp: ƒ.ComponentMesh = new ƒ.ComponentMesh(groundMesh);
-      // groundMeshComp.pivot.scaleY(30);
-      // groundMeshComp.pivot.scaleX(30);
-      // let groundIMG: HTMLImageElement = <HTMLImageElement>document.getElementById("ground");
-      // let groundTextureIMG: ƒ.TextureImage = new ƒ.TextureImage();
-      // groundTextureIMG.image = groundIMG;
-      // let groundTextureCoat: ƒ.CoatTextured = new ƒ.CoatTextured();
-      // groundTextureCoat.texture = groundTextureIMG;
-      // groundTextureCoat.repetition = true;
-      // groundTextureCoat.tilingX = 30;
-      // groundTextureCoat.tilingY = 30;
-      // let groundMaterial: ƒ.Material = new ƒ.Material("ground", ƒ.ShaderTexture, groundTextureCoat);
-      // let groundComponentMat: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(groundMaterial);
-
-      // let groundTransformComp: ƒ.ComponentTransform = new ƒ.ComponentTransform(
-      //   ƒ.Matrix4x4.TRANSLATION(new ƒ.Vector3(0, 0, -1)))
-      // floor.addComponent(groundTransformComp);
-      // floor.addComponent(groundMeshComp);
-      // floor.addComponent(groundComponentMat);
-
-      // return floor;
-
-      let cmpTransform: ƒ.ComponentTransform = new ƒ.ComponentTransform();
-      cmpTransform.local.translate(new ƒ.Vector3(_position.x, _position.y, 0));
-
-      let mesh: ƒ.MeshCube = new ƒ.MeshCube();
-      let cmpMesh: ƒ.ComponentMesh = new ƒ.ComponentMesh(mesh);
-
-      let material: ƒ.Material = new ƒ.Material("SolidWhite", ƒ.ShaderFlat, new ƒ.CoatColored(ƒ.Color.CSS("WHITE")));
-      let cmpMaterial: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(material);
-
-      floor.addComponent(cmpTransform);
-      floor.addComponent(cmpMesh);
-      floor.addComponent(cmpMaterial);
-
-      console.log("Here")
-
       return floor;
     }
-    public static loadImages(): void {
-      Map.floorImg = document.querySelector("#floor");
+
+    private createWallSide(): ƒ.Node {
+      let floor: ƒ.Node = new ƒ.Node("Floor");
+      return floor;
     }
-
-    public createTerrainNode(_img: HTMLImageElement): ƒAid.Node {
-      let txt: ƒ.TextureImage = new ƒ.TextureImage();
-      let coat: ƒ.CoatTextured = new ƒ.CoatTextured();
-      txt.image = _img;
-      coat.texture = txt;
-
-      let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
-      let mtr: ƒ.Material = new ƒ.Material("mtrTerrain", ƒ.ShaderTexture, coat);
-
-      let terrain: ƒAid.Node = new ƒAid.Node("Terrain", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
-      let terrainsCmpMesh: ƒ.ComponentMesh = terrain.getComponent(ƒ.ComponentMesh);
-      terrainsCmpMesh.pivot.scale(new ƒ.Vector3(20, 20, 0));
-
-      return terrain;
-  }
 
     private getTextureMaterial(_name: string, _img: HTMLImageElement): ƒ.Material {
       let txt: ƒ.TextureImage = new ƒ.TextureImage();
@@ -91,16 +99,6 @@ namespace BomberMan {
       txt.image = _img;
       coatTxt.texture = txt;
       return new ƒ.Material(_name, ƒ.ShaderTexture, coatTxt);
-    }
-
-    private createGround(): ƒ.Node {
-      let floor: ƒ.Node = new ƒ.Node("Floor");
-      return floor;
-    }
-
-    private createBox(): ƒ.Node {
-      let floor: ƒ.Node = new ƒ.Node("Floor");
-      return floor;
     }
   }
 }

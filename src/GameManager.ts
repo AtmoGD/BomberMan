@@ -14,12 +14,9 @@ namespace BomberMan {
     }
 
     public startGame(): void {
+      Map.loadImages();
       this.map = MapGenerator.generateWorld();
       this.graph.appendChild(this.map);
-      
-      for (let node of this.graph.getChildren()) {
-        console.log(node);
-      }
     }
 
     public getMap(): Map {

@@ -24,4 +24,11 @@ namespace BomberMan {
     
     document.cookie = _name + "=" + "; expires=" + date.toUTCString() + "; path=/";
   }
+  export function getTextureMaterial(_name: string, _img: HTMLImageElement): ƒ.Material {
+    let txt: ƒ.TextureImage = new ƒ.TextureImage();
+    let coatTxt: ƒ.CoatTextured = new ƒ.CoatTextured();
+    txt.image = _img;
+    coatTxt.texture = txt;
+    return new ƒ.Material(_name, ƒ.ShaderTexture, coatTxt);
+  }
 }

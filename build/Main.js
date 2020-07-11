@@ -45,12 +45,42 @@ var BomberMan;
 var BomberMan;
 ///<reference path="Destroyable.ts"/>
 (function (BomberMan) {
-    class Man extends BomberMan.Destroyable {
+    let ACTION;
+    (function (ACTION) {
+        ACTION["IDLE"] = "Idle";
+        ACTION["WALK"] = "Walk";
+    })(ACTION = BomberMan.ACTION || (BomberMan.ACTION = {}));
+    let DIRECTION;
+    (function (DIRECTION) {
+        DIRECTION[DIRECTION["LEFT"] = 0] = "LEFT";
+        DIRECTION[DIRECTION["RIGHT"] = 1] = "RIGHT";
+        DIRECTION[DIRECTION["UP"] = 2] = "UP";
+        DIRECTION[DIRECTION["DOWN"] = 3] = "DOWN";
+    })(DIRECTION = BomberMan.DIRECTION || (BomberMan.DIRECTION = {}));
+    class Man extends BomberMan.ƒAid.NodeSprite {
         constructor(_name) {
             super(_name ? _name : "Man");
             this.bombLevel = 1;
             this.bombSpeed = 1;
             this.canBomb = true;
+            this.update = (_event) => {
+            };
+            this.addComponent(new BomberMan.ƒ.ComponentTransform());
+            this.show(ACTION.IDLE);
+            BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+        }
+        static generateSprites(_spritesheet) {
+            Man.animations = {};
+            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation(ACTION.WALK, _spritesheet);
+            sprite.generateByGrid(BomberMan.ƒ.Rectangle.GET(1, 1, 1, 1), 6, BomberMan.ƒ.Vector2.ZERO(), 2, BomberMan.ƒ.ORIGIN2D.CENTER);
+            Man.animations[ACTION.WALK] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(ACTION.IDLE, _spritesheet);
+            sprite.generateByGrid(BomberMan.ƒ.Rectangle.GET(1, 20, 45, 72), 4, BomberMan.ƒ.Vector2.ZERO(), 64, BomberMan.ƒ.ORIGIN2D.BOTTOMCENTER);
+            Man.animations[ACTION.IDLE] = sprite;
+            sprite.frames[2].timeScale = 10;
+        }
+        show(_action) {
+            this.setAnimation(Man.animations[_action]);
         }
     }
     BomberMan.Man = Man;
@@ -82,7 +112,7 @@ var BomberMan;
 var BomberMan;
 (function (BomberMan) {
     BomberMan.Data = {
-        cameraDistance: 20,
+        cameraDistance: 40,
         loopMode: BomberMan.ƒ.LOOP_MODE.TIME_REAL,
         fps: 30
     };
@@ -150,6 +180,7 @@ var BomberMan;
     class GameManager {
         constructor(_viewport, _graph) {
             this.map = null;
+            this.bomberman = null;
             this.destroyables = [];
             this.gameOver = false;
             this.viewport = _viewport;
@@ -157,11 +188,19 @@ var BomberMan;
         }
         startGame() {
             BomberMan.Map.loadImages();
-            this.map = BomberMan.MapGenerator.generateWorld();
+            this.map = BomberMan.MapGenerator.generateRandomMap(21);
             this.graph.appendChild(this.map);
+            this.loadSprites();
+            this.bomberman = new BomberMan.BomberMan("Bomberman");
+            this.graph.appendChild(this.bomberman);
         }
         getMap() {
             return this.map;
+        }
+        loadSprites() {
+            let img = document.querySelector("spritesheet");
+            let spritesheet = BomberMan.ƒAid.createSpriteSheet("Spritesheet", img);
+            BomberMan.Man.generateSprites(spritesheet);
         }
     }
     BomberMan.GameManager = GameManager;
@@ -202,6 +241,7 @@ var BomberMan;
                     tile = this.createWallTop(_pos);
                     break;
                 case 2:
+                    tile = this.createBox(_pos);
                     break;
                 case 3:
                     break;
@@ -215,7 +255,7 @@ var BomberMan;
         }
         createGras(_pos) {
             let mesh = new BomberMan.ƒ.MeshSprite();
-            let mtr = this.getTextureMaterial("Gras", Map.grasImg);
+            let mtr = BomberMan.getTextureMaterial("Gras", Map.grasImg);
             let gras = new BomberMan.ƒAid.Node("gras", BomberMan.ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
             let cmpTransform = gras.getComponent(BomberMan.ƒ.ComponentTransform);
             cmpTransform.local.translate(_pos);
@@ -223,26 +263,23 @@ var BomberMan;
         }
         createWallTop(_pos) {
             let mesh = new BomberMan.ƒ.MeshSprite();
-            let mtr = this.getTextureMaterial("WallTop", Map.walltImg);
-            let wallt = new BomberMan.ƒAid.Node("gras", BomberMan.ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+            let mtr = BomberMan.getTextureMaterial("WallTop", Map.walltImg);
+            let wallt = new BomberMan.ƒAid.Node("walltop", BomberMan.ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
             let cmpTransform = wallt.getComponent(BomberMan.ƒ.ComponentTransform);
             cmpTransform.local.translate(_pos);
             return wallt;
         }
-        createBox() {
-            let floor = new BomberMan.ƒ.Node("Floor");
-            return floor;
+        createBox(_pos) {
+            let mesh = new BomberMan.ƒ.MeshSprite();
+            let mtr = BomberMan.getTextureMaterial("Box", Map.boxImg);
+            let box = new BomberMan.ƒAid.Node("box", BomberMan.ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+            let cmpTransform = box.getComponent(BomberMan.ƒ.ComponentTransform);
+            cmpTransform.local.translate(_pos);
+            return box;
         }
         createWallSide() {
             let floor = new BomberMan.ƒ.Node("Floor");
             return floor;
-        }
-        getTextureMaterial(_name, _img) {
-            let txt = new BomberMan.ƒ.TextureImage();
-            let coatTxt = new BomberMan.ƒ.CoatTextured();
-            txt.image = _img;
-            coatTxt.texture = txt;
-            return new BomberMan.ƒ.Material(_name, BomberMan.ƒ.ShaderTexture, coatTxt);
         }
     }
     BomberMan.Map = Map;
@@ -250,8 +287,63 @@ var BomberMan;
 var BomberMan;
 (function (BomberMan) {
     class MapGenerator {
-        static generateWorld() {
-            return new BomberMan.Map(BomberMan.firstMap);
+        static generateRandomMap(_size) {
+            if (!_size)
+                _size = Math.floor((Math.random() * 5) + 5);
+            let mode = Math.floor(Math.random() * 1);
+            switch (mode) {
+                default:
+                    return new BomberMan.Map(this.randomGrid(_size));
+            }
+        }
+        static randomGrid(_size) {
+            let _data = [];
+            for (let i = 0; i < _size; i++)
+                _data[i] = [];
+            let rndSize = Math.floor(Math.random() * 7) + 4;
+            for (let y = 0; y < _size; y++) {
+                for (let x = 0; x < _size; x++) {
+                    if (x == 0 || y == 0 || x == _size - 1 || y == _size - 1) {
+                        _data[y][x] = 1;
+                    }
+                    else {
+                        if ((x % rndSize == 0) || y % rndSize == 0) {
+                            _data[y][x] = 2;
+                        }
+                        else {
+                            _data[y][x] = 0;
+                        }
+                    }
+                }
+            }
+            return _data;
+        }
+        static randomCross(_size) {
+            let _data = [];
+            for (let i = 0; i < _size; i++)
+                _data[i] = [];
+            let rndSize = Math.floor(Math.random() * 5) + 4;
+            for (let y = 0; y < _size; y++) {
+                for (let x = 0; x < _size; x++) {
+                    if (x == 0 || y == 0 || x == _size - 1 || y == _size - 1) {
+                        _data[y][x] = 1;
+                    }
+                    else {
+                        if (_data[y][x] != undefined)
+                            continue;
+                        if (x % rndSize - 1 == 0 && y % rndSize == 0) {
+                            _data[y + 1][x] = 2;
+                            _data[y - 1][x] = 2;
+                            _data[y][x] = 2;
+                            _data[y][x + 1] = 2;
+                            _data[y][x - 1] = 2;
+                        }
+                        else
+                            _data[y][x] = 0;
+                    }
+                }
+            }
+            return _data;
         }
     }
     BomberMan.MapGenerator = MapGenerator;
@@ -310,5 +402,13 @@ var BomberMan;
         document.cookie = _name + "=" + "; expires=" + date.toUTCString() + "; path=/";
     }
     BomberMan.deleteCookie = deleteCookie;
+    function getTextureMaterial(_name, _img) {
+        let txt = new BomberMan.ƒ.TextureImage();
+        let coatTxt = new BomberMan.ƒ.CoatTextured();
+        txt.image = _img;
+        coatTxt.texture = txt;
+        return new BomberMan.ƒ.Material(_name, BomberMan.ƒ.ShaderTexture, coatTxt);
+    }
+    BomberMan.getTextureMaterial = getTextureMaterial;
 })(BomberMan || (BomberMan = {}));
 //# sourceMappingURL=Main.js.map

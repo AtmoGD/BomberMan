@@ -1,6 +1,6 @@
 namespace BomberMan {
   export let Data = {
-    cameraDistance: 20,
+    cameraDistance: 40,
     loopMode: ƒ.LOOP_MODE.TIME_REAL,
     fps: 30
   };

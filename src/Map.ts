@@ -46,6 +46,7 @@ namespace BomberMan {
           tile = this.createWallTop(_pos);
           break;
         case 2:
+          tile = this.createBox(_pos);
           break;
         case 3:
           break;
@@ -60,7 +61,7 @@ namespace BomberMan {
     }
     public createGras(_pos: ƒ.Vector3): ƒAid.Node {
       let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
-      let mtr: ƒ.Material = this.getTextureMaterial("Gras", Map.grasImg);
+      let mtr: ƒ.Material = getTextureMaterial("Gras", Map.grasImg);
 
       let gras: ƒAid.Node = new ƒAid.Node("gras", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
 
@@ -72,9 +73,9 @@ namespace BomberMan {
 
     public createWallTop(_pos: ƒ.Vector3): ƒAid.Node {
       let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
-      let mtr: ƒ.Material = this.getTextureMaterial("WallTop", Map.walltImg);
+      let mtr: ƒ.Material = getTextureMaterial("WallTop", Map.walltImg);
 
-      let wallt: ƒAid.Node = new ƒAid.Node("gras", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+      let wallt: ƒAid.Node = new ƒAid.Node("walltop", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
 
       let cmpTransform: ƒ.ComponentTransform = wallt.getComponent(ƒ.ComponentTransform);
       cmpTransform.local.translate(_pos);
@@ -82,23 +83,21 @@ namespace BomberMan {
       return wallt;
     }
 
+    public createBox(_pos: ƒ.Vector3): ƒAid.Node {
+      let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
+      let mtr: ƒ.Material = getTextureMaterial("Box", Map.boxImg);
 
-    private createBox(): ƒ.Node {
-      let floor: ƒ.Node = new ƒ.Node("Floor");
-      return floor;
+      let box: ƒAid.Node = new ƒAid.Node("box", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+
+      let cmpTransform: ƒ.ComponentTransform = box.getComponent(ƒ.ComponentTransform);
+      cmpTransform.local.translate(_pos);
+
+      return box;
     }
 
     private createWallSide(): ƒ.Node {
       let floor: ƒ.Node = new ƒ.Node("Floor");
       return floor;
-    }
-
-    private getTextureMaterial(_name: string, _img: HTMLImageElement): ƒ.Material {
-      let txt: ƒ.TextureImage = new ƒ.TextureImage();
-      let coatTxt: ƒ.CoatTextured = new ƒ.CoatTextured();
-      txt.image = _img;
-      coatTxt.texture = txt;
-      return new ƒ.Material(_name, ƒ.ShaderTexture, coatTxt);
     }
   }
 }

@@ -58,29 +58,55 @@ var BomberMan;
         DIRECTION[DIRECTION["DOWN"] = 3] = "DOWN";
     })(DIRECTION = BomberMan.DIRECTION || (BomberMan.DIRECTION = {}));
     class Man extends BomberMan.ƒAid.NodeSprite {
-        constructor(_name) {
+        constructor(_map, _name) {
             super(_name ? _name : "Man");
             this.bombLevel = 1;
             this.bombSpeed = 1;
             this.canBomb = true;
-            this.update = (_event) => {
-            };
+            this.map = _map;
+            this.position = this.map.createSpawnPoint(3);
             this.addComponent(new BomberMan.ƒ.ComponentTransform());
-            this.show(ACTION.IDLE);
+            this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
+            this.mtxLocal.translateX(-0.5);
+            this.mtxLocal.translateY(-0.5);
+            this.mtxLocal.translateZ(1);
+            this.destiny = this.position;
+            console.log(this.position);
+            this.show(ACTION.IDLE, DIRECTION.DOWN);
             BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         }
-        static generateSprites(_spritesheet) {
-            Man.animations = {};
-            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation(ACTION.WALK, _spritesheet);
-            sprite.generateByGrid(BomberMan.ƒ.Rectangle.GET(1, 1, 1, 1), 6, BomberMan.ƒ.Vector2.ZERO(), 2, BomberMan.ƒ.ORIGIN2D.CENTER);
-            Man.animations[ACTION.WALK] = sprite;
-            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(ACTION.IDLE, _spritesheet);
-            sprite.generateByGrid(BomberMan.ƒ.Rectangle.GET(1, 20, 45, 72), 4, BomberMan.ƒ.Vector2.ZERO(), 64, BomberMan.ƒ.ORIGIN2D.BOTTOMCENTER);
-            Man.animations[ACTION.IDLE] = sprite;
-            sprite.frames[2].timeScale = 10;
+        update(_event) {
         }
-        show(_action) {
-            this.setAnimation(Man.animations[_action]);
+        generateSprites() {
+            console.log("generateSprites");
+        }
+        move(_dir) {
+            let newPos = this.position.getMutator();
+            switch (_dir) {
+                case DIRECTION.UP:
+                    newPos.y -= 1;
+                    break;
+                case DIRECTION.DOWN:
+                    newPos.y += 1;
+                    break;
+                case DIRECTION.LEFT:
+                    newPos.x -= 1;
+                    break;
+                case DIRECTION.RIGHT:
+                    newPos.x += 1;
+                    break;
+            }
+            if (this.map.data[newPos.y][newPos.x] != 0)
+                return;
+            this.position.mutate(newPos);
+            this.mtxLocal.translation = this.map.mapElements[newPos.y][newPos.x].mtxLocal.translation;
+            this.mtxLocal.translateX(-0.5);
+            this.mtxLocal.translateY(-0.5);
+            this.mtxLocal.translateZ(1);
+            this.show(ACTION.IDLE, _dir);
+        }
+        show(_action, _direction) {
+            this.setAnimation(Man.animations[_action + _direction]);
         }
     }
     BomberMan.Man = Man;
@@ -90,10 +116,55 @@ var BomberMan;
 ///<reference path="Man.ts"/>
 (function (BomberMan_1) {
     class BomberMan extends BomberMan_1.Man {
-        constructor(_name) {
-            super(_name ? _name : "BomberMan");
+        constructor(_map, _name) {
+            super(_map, _name ? _name : "BomberMan");
             this.lives = 3;
             this.score = 0;
+            this.initKeyEvent();
+        }
+        initKeyEvent() {
+            window.addEventListener("keydown", this.handleKeyPress.bind(this));
+        }
+        handleKeyPress(_event) {
+            switch (_event.code) {
+                case BomberMan_1.ƒ.KEYBOARD_CODE.W:
+                    super.move(BomberMan_1.DIRECTION.UP);
+                    break;
+                case BomberMan_1.ƒ.KEYBOARD_CODE.S:
+                    super.move(BomberMan_1.DIRECTION.DOWN);
+                    break;
+                case BomberMan_1.ƒ.KEYBOARD_CODE.A:
+                    super.move(BomberMan_1.DIRECTION.LEFT);
+                    break;
+                case BomberMan_1.ƒ.KEYBOARD_CODE.D:
+                    super.move(BomberMan_1.DIRECTION.RIGHT);
+                    break;
+            }
+        }
+        // protected move(): void {
+        //   this.show(ACTION.IDLE, this.dir);
+        // }
+        static generateSprites(_coat) {
+            BomberMan.animations = {};
+            let sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.UP, _coat);
+            let startRect = new BomberMan_1.ƒ.Rectangle(0, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan_1.ƒ.Vector2.ZERO(), 15, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.animations[BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.UP] = sprite;
+            sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.DOWN, _coat);
+            startRect = new BomberMan_1.ƒ.Rectangle(16, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.animations[BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.DOWN] = sprite;
+            sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.LEFT, _coat);
+            startRect = new BomberMan_1.ƒ.Rectangle(64, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.animations[BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.LEFT] = sprite;
+            sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.RIGHT, _coat);
+            startRect = new BomberMan_1.ƒ.Rectangle(64, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.animations[BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.RIGHT] = sprite;
+        }
+        show(_action, _direction) {
+            this.setAnimation(BomberMan.animations[_action + _direction]);
         }
     }
     BomberMan_1.BomberMan = BomberMan;
@@ -135,7 +206,7 @@ var BomberMan;
     let gameOverlay;
     let gameOverOverlay;
     let startButton;
-    BomberMan.ƒ.RenderManager.initialize(true, true);
+    // ƒ.RenderManager.initialize(true, true);
     function initGame() {
         getReferences();
         installEventListener();
@@ -148,7 +219,7 @@ var BomberMan;
         const canvas = document.querySelector("canvas");
         viewport = new BomberMan.ƒ.Viewport();
         viewport.initialize("Viewport", graph, camera, canvas);
-        gameManager = new BomberMan.GameManager(viewport, graph);
+        gameManager = new BomberMan.GameManager(viewport, graph, camera);
         viewport.draw();
         let gizmo = new BomberMan.ƒAid.NodeCoordinateSystem("ControlSystem");
         graph.addChild(gizmo);
@@ -173,34 +244,38 @@ var BomberMan;
         gameOverlay.style.display = "flex";
         gameOverOverlay.style.display = "none";
         gameManager.startGame();
+        viewport.draw();
     }
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
     class GameManager {
-        constructor(_viewport, _graph) {
+        constructor(_viewport, _graph, _camera) {
             this.map = null;
             this.bomberman = null;
             this.destroyables = [];
             this.gameOver = false;
             this.viewport = _viewport;
             this.graph = _graph;
+            this.camera = _camera;
         }
         startGame() {
             BomberMan.Map.loadImages();
             this.map = BomberMan.MapGenerator.generateRandomMap(21);
             this.graph.appendChild(this.map);
             this.loadSprites();
-            this.bomberman = new BomberMan.BomberMan("Bomberman");
+            this.bomberman = new BomberMan.BomberMan(this.map, "Bomberman");
             this.graph.appendChild(this.bomberman);
         }
         getMap() {
             return this.map;
         }
         loadSprites() {
-            let img = document.querySelector("spritesheet");
-            let spritesheet = BomberMan.ƒAid.createSpriteSheet("Spritesheet", img);
-            BomberMan.Man.generateSprites(spritesheet);
+            let img = document.querySelector("#spritesheet");
+            let coat = new BomberMan.ƒ.CoatTextured();
+            coat.texture = new BomberMan.ƒ.TextureImage();
+            coat.texture.image = img;
+            BomberMan.BomberMan.generateSprites(coat);
         }
     }
     BomberMan.GameManager = GameManager;
@@ -217,7 +292,6 @@ var BomberMan;
             this.generateMap();
         }
         generateMap() {
-            // <-------------------------------------------TODO make map appear in middle--------->
             for (let y = 0; y < this.data.length; y++) {
                 for (let x = 0; x < this.data[y].length; x++) {
                     let pos = new BomberMan.ƒ.Vector3(x - (this.data[0].length / 2) + 0.5, -(y - (this.data.length / 2) + 0.5), 0);
@@ -252,6 +326,17 @@ var BomberMan;
                 this.appendChild(tile);
                 this.mapElements[_y][_x] = tile;
             }
+        }
+        createSpawnPoint(_type) {
+            for (let y = 0; y < this.data.length; y++) {
+                for (let x = 0; x < this.data[y].length; x++) {
+                    if (this.data[y][x] == 0 && this.data[y][x + 1] == 0 && this.data[y + 1][x] == 0) {
+                        // this.data[y][x] = _type;
+                        return new BomberMan.ƒ.Vector2(x, y);
+                    }
+                }
+            }
+            return null;
         }
         createGras(_pos) {
             let mesh = new BomberMan.ƒ.MeshSprite();
@@ -403,10 +488,9 @@ var BomberMan;
     }
     BomberMan.deleteCookie = deleteCookie;
     function getTextureMaterial(_name, _img) {
-        let txt = new BomberMan.ƒ.TextureImage();
         let coatTxt = new BomberMan.ƒ.CoatTextured();
-        txt.image = _img;
-        coatTxt.texture = txt;
+        coatTxt.texture = new BomberMan.ƒ.TextureImage();
+        coatTxt.texture.image = _img;
         return new BomberMan.ƒ.Material(_name, BomberMan.ƒ.ShaderTexture, coatTxt);
     }
     BomberMan.getTextureMaterial = getTextureMaterial;

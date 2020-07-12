@@ -3,17 +3,19 @@ namespace BomberMan {
 
     private viewport: ƒ.Viewport;
     private graph: ƒ.Node;
+    private camera: ƒ.ComponentCamera;
 
     private map: Map = null;
-    private bomberman: BomberMan = null;
+    public bomberman: BomberMan = null;
     private destroyables: Destroyable[] = [];
     private gameOver: boolean = false;
 
     private spritesheet: ƒ.CoatTextured;
 
-    constructor(_viewport: ƒ.Viewport, _graph: ƒ.Node) {
+    constructor(_viewport: ƒ.Viewport, _graph: ƒ.Node, _camera: ƒ.ComponentCamera) {
       this.viewport = _viewport;
       this.graph = _graph;
+      this.camera = _camera;
     }
 
     public startGame(): void {
@@ -22,8 +24,9 @@ namespace BomberMan {
       this.graph.appendChild(this.map);
 
       this.loadSprites();
-      this.bomberman = new BomberMan("Bomberman");
+      this.bomberman = new BomberMan(this.map, "Bomberman");
       this.graph.appendChild(this.bomberman);
+
     }
 
     public getMap(): Map {
@@ -31,9 +34,11 @@ namespace BomberMan {
     }
 
     private loadSprites(): void {
-      let img: HTMLImageElement = document.querySelector("spritesheet");
-      let spritesheet: ƒ.CoatTextured = ƒAid.createSpriteSheet("Spritesheet", img);
-      Man.generateSprites(spritesheet);
+      let img: HTMLImageElement = document.querySelector("#spritesheet");
+      let coat: ƒ.CoatTextured = new ƒ.CoatTextured();
+      coat.texture = new ƒ.TextureImage();
+      coat.texture.image = img;
+      BomberMan.generateSprites(coat);
     }
   }
 }

@@ -12,10 +12,10 @@ namespace BomberMan {
 
   let startButton: HTMLButtonElement;
 
-  ƒ.RenderManager.initialize(true, true);
+  // ƒ.RenderManager.initialize(true, true);
 
   export function initGame(): void {
-    
+
     getReferences();
     installEventListener();
 
@@ -32,7 +32,7 @@ namespace BomberMan {
     viewport = new ƒ.Viewport();
     viewport.initialize("Viewport", graph, camera, canvas);
 
-    gameManager = new GameManager(viewport, graph);
+    gameManager = new GameManager(viewport, graph, camera);
     viewport.draw();
 
     let gizmo = new ƒAid.NodeCoordinateSystem("ControlSystem");
@@ -63,5 +63,7 @@ namespace BomberMan {
     gameOverOverlay.style.display = "none";
 
     gameManager.startGame();
+
+    viewport.draw();
   }
 }

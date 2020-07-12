@@ -5,8 +5,8 @@ namespace BomberMan {
     public static wallsImg: HTMLImageElement;
     public static walltImg: HTMLImageElement;
 
-    private data: number[][];
-    private mapElements: ƒAid.Node[][] = [];
+    public data: number[][];
+    public mapElements: ƒAid.Node[][] = [];
 
     constructor(_data: number[][]) {
       super("Map");
@@ -20,7 +20,6 @@ namespace BomberMan {
     }
 
     private generateMap(): void {
-      // <-------------------------------------------TODO make map appear in middle--------->
       for (let y: number = 0; y < this.data.length; y++) {
         for (let x: number = 0; x < this.data[y].length; x++) {
           let pos: ƒ.Vector3 = new ƒ.Vector3(x - (this.data[0].length / 2) + 0.5, -(y - (this.data.length / 2) + 0.5), 0);
@@ -59,6 +58,19 @@ namespace BomberMan {
         this.mapElements[_y][_x] = tile;
       }
     }
+
+    public createSpawnPoint(_type: number): ƒ.Vector2 {
+      for (let y: number = 0; y < this.data.length; y++) {
+        for (let x: number = 0; x < this.data[y].length; x++) {
+          if (this.data[y][x] == 0 && this.data[y][x + 1] == 0 && this.data[y + 1][x] == 0){
+            // this.data[y][x] = _type;
+            return new ƒ.Vector2(x, y);
+          }
+        }
+      }
+      return null;
+    }
+
     public createGras(_pos: ƒ.Vector3): ƒAid.Node {
       let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
       let mtr: ƒ.Material = getTextureMaterial("Gras", Map.grasImg);

@@ -22,7 +22,7 @@ namespace BomberMan {
     private generateMap(): void {
       for (let y: number = 0; y < this.data.length; y++) {
         for (let x: number = 0; x < this.data[y].length; x++) {
-          let pos: ƒ.Vector3 = new ƒ.Vector3(x - (this.data[0].length / 2) + 0.5, -(y - (this.data.length / 2) + 0.5), 0);
+          let pos: ƒ.Vector3 = new ƒ.Vector3(x - Math.floor((this.data[0].length / 2)), -Math.floor((y - (this.data.length / 2))), 0);
           this.createTile(y, x, pos);
         }
       }
@@ -63,7 +63,7 @@ namespace BomberMan {
       for (let y: number = 0; y < this.data.length; y++) {
         for (let x: number = 0; x < this.data[y].length; x++) {
           if (this.data[y][x] == 0 && this.data[y][x + 1] == 0 && this.data[y + 1][x] == 0){
-            // this.data[y][x] = _type;
+            this.data[y][x] = _type;
             return new ƒ.Vector2(x, y);
           }
         }

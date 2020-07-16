@@ -23,7 +23,7 @@ namespace BomberMan {
     camera.pivot.translateZ(Data.cameraDistance);
     camera.pivot.rotateY(180);
 
-    let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
+    let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(1, 1, 0);
     camera.pivot.lookAt(cameraLookAt);
 
     graph = new ƒ.Node("Graph");

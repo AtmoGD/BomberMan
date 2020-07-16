@@ -12,66 +12,71 @@ namespace BomberMan {
   export class Man extends ƒAid.NodeSprite {
     protected static animations: ƒAid.SpriteSheetAnimations;
 
+    protected gameManager: GameManager;
     protected bombLevel: number = 1;
     protected bombSpeed: number = 1;
     protected canBomb: boolean = true;
     protected action: ACTION;
     protected map: Map;
     protected position: ƒ.Vector2;
-    protected destiny: ƒ.Vector2;
+    protected speed: number = 4;
 
-    constructor(_map: Map, _name?: string) {
+    constructor(_map: Map, _gameManager: GameManager, _name?: string) {
       super(_name ? _name : "Man");
-      this.map = _map;
+      this.map = _map; 
+      this.gameManager = _gameManager;
       this.position = this.map.createSpawnPoint(3);
 
       this.addComponent(new ƒ.ComponentTransform());
-      this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
+      // this.mtxLocal.scaling = ƒ.Vector3.ONE();
+      this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation.copy;
       this.mtxLocal.translateX(-0.5);
       this.mtxLocal.translateY(-0.5);
       this.mtxLocal.translateZ(1);
-      this.destiny = this.position;
 
       console.log(this.position);
+      console.log(this.mtxLocal);
+      console.log(this.map);
+
       this.show(ACTION.IDLE, DIRECTION.DOWN);
-      ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.update);
     }
 
-    public update(_event: ƒ.Eventƒ): void {
-
-    }
 
     public generateSprites(): void {
       console.log("generateSprites");
     }
 
     protected move(_dir: DIRECTION): void {
-      let newPos: ƒ.Mutator = this.position.getMutator();
+
+      console.log(this.mtxLocal);
+
+      let pos: ƒ.Matrix4x4 = this.mtxLocal.copy;
 
       switch (_dir) {
         case DIRECTION.UP:
-          newPos.y -= 1;
+          pos.translateY(1 / Data.fps * this.speed);
           break;
         case DIRECTION.DOWN:
-          newPos.y += 1;
+          pos.translateY(-1 / Data.fps * this.speed);
           break;
         case DIRECTION.LEFT:
-          newPos.x -= 1;
+          pos.translateX(-1 / Data.fps * this.speed);
           break;
         case DIRECTION.RIGHT:
-          newPos.x += 1;
+          pos.translateX(1 / Data.fps * this.speed);
           break;
       }
 
-      if (this.map.data[newPos.y][newPos.x] != 0)
+      if (this.gameManager.checkCollisionAll(pos.translation))
         return;
-      
-      this.position.mutate(newPos);
-      this.mtxLocal.translation = this.map.mapElements[newPos.y][newPos.x].mtxLocal.translation;
-      this.mtxLocal.translateX(-0.5);
-      this.mtxLocal.translateY(-0.5);
-      this.mtxLocal.translateZ(1);
-      this.show(ACTION.IDLE, _dir);
+
+      this.mtxLocal.translation = pos.translation;
+      this.show(ACTION.WALK, _dir);
+    }
+
+    public checkCollision(_pos: ƒ.Mutator): boolean {
+
+      return false;
     }
 
     public show(_action: ACTION, _direction: DIRECTION): void {

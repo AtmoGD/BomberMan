@@ -1,18 +1,18 @@
 namespace BomberMan {
   export class GameManager {
-
     private viewport: ƒ.Viewport;
-    private graph: ƒ.Node;
+    public graph: ƒ.Node;
     private camera: ƒ.ComponentCamera;
 
-    private map: Map = null;
+    public map: Map = null;
+    public mans: Man[] = [];
+    public destroyables: Destroyable[] = [];
     public bomberman: BomberMan = null;
-    private destroyables: Destroyable[] = [];
+
     private gameOver: boolean = false;
 
-    private spritesheet: ƒ.CoatTextured;
-
     constructor(_viewport: ƒ.Viewport, _graph: ƒ.Node, _camera: ƒ.ComponentCamera) {
+
       this.viewport = _viewport;
       this.graph = _graph;
       this.camera = _camera;
@@ -24,9 +24,33 @@ namespace BomberMan {
       this.graph.appendChild(this.map);
 
       this.loadSprites();
-      this.bomberman = new BomberMan(this.map, "Bomberman");
+      this.bomberman = new BomberMan(this.map, this, "Bomberman");
       this.graph.appendChild(this.bomberman);
 
+    }
+    public checkCollisionAll(_target: ƒ.Vector3): Man | Destroyable | null {
+
+      let restDest: Destroyable | null = this.checkCollisionDestroyables(_target);
+      let restMan: Man | null = this.checkCollisionMans(_target);
+      return restDest ? restDest : restMan;
+    }
+
+    public checkCollisionDestroyables(_pos: ƒ.Vector3): Destroyable | null {
+      for (let dest of this.destroyables) {
+        if (dest.mtxLocal.translation.isInsideSphere(_pos, 1)) {
+          return dest;
+        }
+      }
+      return null;
+    }
+
+    public checkCollisionMans(_pos: ƒ.Vector3): Man | null {
+      for (let man of this.mans) {
+        if (man.mtxLocal.translation.isInsideSphere(_pos, 1)) {
+          return man;
+        }
+      }
+      return null;
     }
 
     public getMap(): Map {

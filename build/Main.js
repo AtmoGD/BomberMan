@@ -71,18 +71,19 @@ var BomberMan;
         DIRECTION[DIRECTION["DOWN"] = 3] = "DOWN";
     })(DIRECTION = BomberMan.DIRECTION || (BomberMan.DIRECTION = {}));
     class Man extends BomberMan.ƒAid.NodeSprite {
-        constructor(_map, _gameManager, _name) {
+        constructor(_map, _gameManager, _type, _name) {
             super(_name ? _name : "Man");
             this.bombLevel = 1;
             this.bombSpeed = 1;
             this.canBomb = true;
             this.position = BomberMan.ƒ.Vector2.ZERO();
-            this.speed = 6;
+            this.speed = 4;
             this.direc = DIRECTION.DOWN;
             this.distance = 0;
             this.map = _map;
+            this.type = _type;
             this.gameManager = _gameManager;
-            this.position = this.map.createSpawnPoint(3);
+            this.position = this.map.createSpawnPoint(this.type);
             this.transform = new BomberMan.ƒ.ComponentTransform();
             this.addComponent(this.transform);
             this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
@@ -96,19 +97,19 @@ var BomberMan;
             if (this.distance > 0) {
                 switch (this.direc) {
                     case DIRECTION.UP:
-                        this.mtxLocal.translateY((1 / BomberMan.Data.fps));
+                        this.mtxLocal.translateY((1 / BomberMan.Data.fps) * this.speed);
                         break;
                     case DIRECTION.DOWN:
-                        this.mtxLocal.translateY(-(1 / BomberMan.Data.fps));
+                        this.mtxLocal.translateY(-(1 / BomberMan.Data.fps) * this.speed);
                         break;
                     case DIRECTION.LEFT:
-                        this.mtxLocal.translateX(-(1 / BomberMan.Data.fps));
+                        this.mtxLocal.translateX(-(1 / BomberMan.Data.fps) * this.speed);
                         break;
                     case DIRECTION.RIGHT:
-                        this.mtxLocal.translateX((1 / BomberMan.Data.fps));
+                        this.mtxLocal.translateX((1 / BomberMan.Data.fps) * this.speed);
                         break;
                 }
-                this.distance -= (1 / BomberMan.Data.fps);
+                this.distance -= (1 / BomberMan.Data.fps) * this.speed;
             }
             else {
                 this.show(ACTION.IDLE, this.direc);
@@ -136,7 +137,7 @@ var BomberMan;
                 return;
             this.map.data[this.position.y][this.position.x] = 0;
             this.position.mutate(newPos);
-            this.map.data[this.position.y][this.position.x] = 3;
+            this.map.data[this.position.y][this.position.x] = this.type;
             this.direc = _dir;
             this.distance = 1;
             this.show(ACTION.WALK, this.direc);
@@ -156,7 +157,7 @@ var BomberMan;
 (function (BomberMan_1) {
     class BomberMan extends BomberMan_1.Man {
         constructor(_map, _gameManager, _name) {
-            super(_map, _gameManager, _name ? _name : "BomberMan");
+            super(_map, _gameManager, 4, _name ? _name : "BomberMan");
             this.lives = 3;
             this.score = 0;
             this.initKeyEvent();

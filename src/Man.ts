@@ -18,17 +18,19 @@ namespace BomberMan {
     protected canBomb: boolean = true;
     protected action: ACTION;
     protected map: Map;
+    protected type: number;
     protected position: ƒ.Vector2 = ƒ.Vector2.ZERO();
-    protected speed: number = 6;
+    protected speed: number = 4;
     protected direc: DIRECTION = DIRECTION.DOWN;
     protected distance: number = 0;
     protected transform: ƒ.ComponentTransform;
 
-    constructor(_map: Map, _gameManager: GameManager, _name?: string) {
+    constructor(_map: Map, _gameManager: GameManager, _type: number, _name?: string) {
       super(_name ? _name : "Man");
       this.map = _map;
+      this.type = _type;
       this.gameManager = _gameManager;
-      this.position = this.map.createSpawnPoint(3);
+      this.position = this.map.createSpawnPoint(this.type);
 
       this.transform = new ƒ.ComponentTransform();
       this.addComponent(this.transform);
@@ -48,19 +50,19 @@ namespace BomberMan {
 
         switch (this.direc) {
           case DIRECTION.UP:
-            this.mtxLocal.translateY((1 / Data.fps));
+            this.mtxLocal.translateY((1 / Data.fps) * this.speed);
             break;
           case DIRECTION.DOWN:
-            this.mtxLocal.translateY(-(1 / Data.fps));
+            this.mtxLocal.translateY(-(1 / Data.fps) * this.speed);
             break;
           case DIRECTION.LEFT:
-            this.mtxLocal.translateX(-(1 / Data.fps));
+            this.mtxLocal.translateX(-(1 / Data.fps) * this.speed);
             break;
           case DIRECTION.RIGHT:
-            this.mtxLocal.translateX((1 / Data.fps));
+            this.mtxLocal.translateX((1 / Data.fps) * this.speed);
             break;
         }
-        this.distance -= (1 / Data.fps);
+        this.distance -= (1 / Data.fps) * this.speed;
       }else {
         this.show(ACTION.IDLE, this.direc);
       }
@@ -93,7 +95,7 @@ namespace BomberMan {
 
       this.map.data[this.position.y][this.position.x] = 0;
       this.position.mutate(newPos);
-      this.map.data[this.position.y][this.position.x] = 3;
+      this.map.data[this.position.y][this.position.x] = this.type;
 
       this.direc = _dir;
       this.distance = 1;

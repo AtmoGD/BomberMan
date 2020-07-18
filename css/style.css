@@ -138,10 +138,6 @@
     font-size: 300%;
   }
 
-  #startOverlay {
-
-  }
-
   #gameOverlay {
     display: none;
   }
@@ -153,5 +149,6 @@
   canvas {
     width: 90vw;
     height: 80vh;
+    background-color: #13bba4;
   }
 /*endregion */

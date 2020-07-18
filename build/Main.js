@@ -28,10 +28,43 @@ var BomberMan;
 ///<reference path="Main.ts"/>
 (function (BomberMan) {
     class Bomb extends BomberMan.ƒAid.NodeSprite {
-        constructor(_level) {
+        constructor(_map, _gameManager, _position, _level) {
             super("Bomb");
-            this.lifetime = 2;
+            this.lifetime = 100;
+            this.type = 3;
+            this.generateAnimations();
             this.level = _level;
+            this.gameManager = _gameManager;
+            this.map = _map;
+            this.position = _position;
+            this.addComponent(new BomberMan.ƒ.ComponentTransform());
+            let pos = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
+            this.mtxLocal.translation = pos;
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.map.data[this.position.y][this.position.x] = this.type;
+            this.setAnimation(this.animations["Explode"]);
+            BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
+        }
+        update() {
+            this.lifetime--;
+            if (this.lifetime <= 0)
+                this.explode();
+        }
+        explode() {
+            this.gameManager.graph.removeChild(this);
+        }
+        generateAnimations() {
+            this.animations = {};
+            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.UP, Bomb.coat);
+            let startRect = new BomberMan.ƒ.Rectangle(48, 0, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.frames.forEach(frame => {
+                frame.timeScale = 10;
+            });
+            this.animations["Explode"] = sprite;
+        }
+        static takeCoat(_coat) {
+            Bomb.coat = _coat;
         }
     }
     BomberMan.Bomb = Bomb;
@@ -133,7 +166,7 @@ var BomberMan;
                     break;
             }
             let mapData = this.map.data[newPos.y][newPos.x];
-            if (mapData == 1 || mapData == 2)
+            if (mapData == 1 || mapData == 2 || mapData == 3)
                 return;
             this.map.data[this.position.y][this.position.x] = 0;
             this.position.mutate(newPos);
@@ -141,6 +174,25 @@ var BomberMan;
             this.direc = _dir;
             this.distance = 1;
             this.show(ACTION.WALK, this.direc);
+        }
+        placeBomb() {
+            console.log("Want to place a bomb");
+            let bombPos = this.position.copy;
+            switch (this.direc) {
+                case DIRECTION.UP:
+                case DIRECTION.DOWN:
+                    bombPos.y = this.direc == DIRECTION.UP ? this.position.y - 1 : this.position.y + 1;
+                    break;
+                case DIRECTION.LEFT:
+                case DIRECTION.RIGHT:
+                    bombPos.x = this.direc == DIRECTION.RIGHT ? this.position.x + 1 : this.position.x - 1;
+                    break;
+            }
+            let mapData = this.map.data[bombPos.y][bombPos.x];
+            if (mapData == 1 || mapData == 2)
+                return;
+            let bomb = new BomberMan.Bomb(this.map, this.gameManager, bombPos, 1);
+            this.gameManager.graph.appendChild(bomb);
         }
         checkCollision(_pos) {
             return false;
@@ -178,6 +230,9 @@ var BomberMan;
                     break;
                 case BomberMan_1.ƒ.KEYBOARD_CODE.D:
                     super.move(BomberMan_1.DIRECTION.RIGHT);
+                    break;
+                case BomberMan_1.ƒ.KEYBOARD_CODE.SPACE:
+                    super.placeBomb();
                     break;
             }
         }
@@ -354,6 +409,7 @@ var BomberMan;
             coat.texture = new BomberMan.ƒ.TextureImage();
             coat.texture.image = img;
             BomberMan.BomberMan.generateSprites(coat);
+            BomberMan.Bomb.takeCoat(coat);
         }
     }
     BomberMan.GameManager = GameManager;

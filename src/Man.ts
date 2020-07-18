@@ -89,7 +89,7 @@ namespace BomberMan {
       }
 
       let mapData: number = this.map.data[newPos.y][newPos.x];
-      if (mapData == 1 || mapData == 2)
+      if (mapData == 1 || mapData == 2 || mapData == 3)
         return;
 
       this.map.data[this.position.y][this.position.x] = 0;
@@ -99,6 +99,27 @@ namespace BomberMan {
       this.direc = _dir;
       this.distance = 1;
       this.show(ACTION.WALK, this.direc);
+    }
+
+    public placeBomb(): void {
+      console.log("Want to place a bomb");
+      let bombPos: ƒ.Vector2 = this.position.copy;
+      switch (this.direc) {
+        case DIRECTION.UP:
+        case DIRECTION.DOWN:
+          bombPos.y = this.direc == DIRECTION.UP ? this.position.y - 1 : this.position.y + 1;
+          break;
+        case DIRECTION.LEFT:
+        case DIRECTION.RIGHT:
+          bombPos.x = this.direc == DIRECTION.RIGHT ? this.position.x + 1 : this.position.x - 1;
+          break;
+      }
+      let mapData: number = this.map.data[bombPos.y][bombPos.x];
+      if (mapData == 1 || mapData == 2)
+        return;
+
+      let bomb: Bomb = new Bomb(this.map, this.gameManager, bombPos, 1);
+      this.gameManager.graph.appendChild(bomb);
     }
 
     public checkCollision(_pos: ƒ.Mutator): boolean {

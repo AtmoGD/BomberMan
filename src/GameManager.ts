@@ -63,6 +63,7 @@ namespace BomberMan {
       coat.texture = new ƒ.TextureImage();
       coat.texture.image = img;
       BomberMan.generateSprites(coat);
+      Bomb.takeCoat(coat);
     }
   }
 }

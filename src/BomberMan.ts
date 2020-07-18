@@ -27,6 +27,9 @@ namespace BomberMan {
         case ƒ.KEYBOARD_CODE.D:
           super.move(DIRECTION.RIGHT);
           break;
+        case ƒ.KEYBOARD_CODE.SPACE:
+          super.placeBomb();
+          break;
       }
     }
 

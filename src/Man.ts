@@ -35,9 +35,7 @@ namespace BomberMan {
       this.transform = new ƒ.ComponentTransform();
       this.addComponent(this.transform);
       this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
-      this.mtxLocal.translateX(-0.5);
-      this.mtxLocal.translateY(-0.5);
-      this.mtxLocal.translateZ(1);
+      this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 1));
 
       this.show(ACTION.IDLE, DIRECTION.DOWN);
       ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.update.bind(this));
@@ -47,23 +45,24 @@ namespace BomberMan {
     public update(): void {
 
       if (this.distance > 0) {
-
+        let dist: number = (1 / Data.fps) * this.speed;
+        dist = dist > this.distance ? this.distance : dist;
         switch (this.direc) {
           case DIRECTION.UP:
-            this.mtxLocal.translateY((1 / Data.fps) * this.speed);
+            this.mtxLocal.translateY(dist);
             break;
           case DIRECTION.DOWN:
-            this.mtxLocal.translateY(-(1 / Data.fps) * this.speed);
+            this.mtxLocal.translateY(-dist);
             break;
           case DIRECTION.LEFT:
-            this.mtxLocal.translateX(-(1 / Data.fps) * this.speed);
+            this.mtxLocal.translateX(-dist);
             break;
           case DIRECTION.RIGHT:
-            this.mtxLocal.translateX((1 / Data.fps) * this.speed);
+            this.mtxLocal.translateX(dist);
             break;
         }
-        this.distance -= (1 / Data.fps) * this.speed;
-      }else {
+        this.distance -= dist;
+      } else {
         this.show(ACTION.IDLE, this.direc);
       }
     }

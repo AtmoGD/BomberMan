@@ -76,45 +76,70 @@ var BomberMan;
             this.bombLevel = 1;
             this.bombSpeed = 1;
             this.canBomb = true;
-            this.speed = 4;
+            this.position = BomberMan.ƒ.Vector2.ZERO();
+            this.speed = 6;
+            this.direc = DIRECTION.DOWN;
+            this.distance = 0;
             this.map = _map;
             this.gameManager = _gameManager;
             this.position = this.map.createSpawnPoint(3);
-            this.addComponent(new BomberMan.ƒ.ComponentTransform());
-            // this.mtxLocal.scaling = ƒ.Vector3.ONE();
-            this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation.copy;
+            this.transform = new BomberMan.ƒ.ComponentTransform();
+            this.addComponent(this.transform);
+            this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
             this.mtxLocal.translateX(-0.5);
             this.mtxLocal.translateY(-0.5);
             this.mtxLocal.translateZ(1);
-            console.log(this.position);
-            console.log(this.mtxLocal);
-            console.log(this.map);
             this.show(ACTION.IDLE, DIRECTION.DOWN);
+            BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
+        }
+        update() {
+            if (this.distance > 0) {
+                switch (this.direc) {
+                    case DIRECTION.UP:
+                        this.mtxLocal.translateY((1 / BomberMan.Data.fps));
+                        break;
+                    case DIRECTION.DOWN:
+                        this.mtxLocal.translateY(-(1 / BomberMan.Data.fps));
+                        break;
+                    case DIRECTION.LEFT:
+                        this.mtxLocal.translateX(-(1 / BomberMan.Data.fps));
+                        break;
+                    case DIRECTION.RIGHT:
+                        this.mtxLocal.translateX((1 / BomberMan.Data.fps));
+                        break;
+                }
+                this.distance -= (1 / BomberMan.Data.fps);
+            }
+            else {
+                this.show(ACTION.IDLE, this.direc);
+            }
         }
         generateSprites() {
             console.log("generateSprites");
         }
         move(_dir) {
-            console.log(this.mtxLocal);
-            let pos = this.mtxLocal.copy;
+            if (this.distance > 0)
+                return;
+            let newPos = this.position.getMutator();
             switch (_dir) {
                 case DIRECTION.UP:
-                    pos.translateY(1 / BomberMan.Data.fps * this.speed);
-                    break;
                 case DIRECTION.DOWN:
-                    pos.translateY(-1 / BomberMan.Data.fps * this.speed);
+                    newPos.y = _dir == DIRECTION.UP ? this.position.y - 1 : this.position.y + 1;
                     break;
                 case DIRECTION.LEFT:
-                    pos.translateX(-1 / BomberMan.Data.fps * this.speed);
-                    break;
                 case DIRECTION.RIGHT:
-                    pos.translateX(1 / BomberMan.Data.fps * this.speed);
+                    newPos.x = _dir == DIRECTION.RIGHT ? this.position.x + 1 : this.position.x - 1;
                     break;
             }
-            if (this.gameManager.checkCollisionAll(pos.translation))
+            let mapData = this.map.data[newPos.y][newPos.x];
+            if (mapData == 1 || mapData == 2)
                 return;
-            this.mtxLocal.translation = pos.translation;
-            this.show(ACTION.WALK, _dir);
+            this.map.data[this.position.y][this.position.x] = 0;
+            this.position.mutate(newPos);
+            this.map.data[this.position.y][this.position.x] = 3;
+            this.direc = _dir;
+            this.distance = 1;
+            this.show(ACTION.WALK, this.direc);
         }
         checkCollision(_pos) {
             return false;
@@ -162,7 +187,7 @@ var BomberMan;
             BomberMan.animations = {};
             let sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.UP, _coat);
             let startRect = new BomberMan_1.ƒ.Rectangle(0, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
-            sprite.generateByGrid(startRect, 1, BomberMan_1.ƒ.Vector2.ZERO(), 15, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             BomberMan.animations[BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.UP] = sprite;
             sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.DOWN, _coat);
             startRect = new BomberMan_1.ƒ.Rectangle(16, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
@@ -178,14 +203,14 @@ var BomberMan;
             BomberMan.animations[BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.RIGHT] = sprite;
             sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.UP, _coat);
             startRect = new BomberMan_1.ƒ.Rectangle(128, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
-            sprite.generateByGrid(startRect, 2, BomberMan_1.ƒ.Vector2.ZERO(), 15, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 2, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             BomberMan.animations[BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.UP] = sprite;
             sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.DOWN, _coat);
             startRect = new BomberMan_1.ƒ.Rectangle(32, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.generateByGrid(startRect, 2, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             BomberMan.animations[BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.DOWN] = sprite;
             sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.LEFT, _coat);
-            startRect = new BomberMan_1.ƒ.Rectangle(214, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            startRect = new BomberMan_1.ƒ.Rectangle(192, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.generateByGrid(startRect, 3, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             BomberMan.animations[BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.LEFT] = sprite;
             sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.RIGHT, _coat);
@@ -369,9 +394,8 @@ var BomberMan;
                 case 2:
                     tile = this.createBox(_pos);
                     break;
-                case 3:
-                    break;
                 default:
+                    tile = this.createGras(_pos);
                     break;
             }
             if (tile) {

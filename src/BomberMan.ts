@@ -39,7 +39,7 @@ namespace BomberMan {
 
       let sprite: ƒAid.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation(ACTION.IDLE + DIRECTION.UP, _coat);
       let startRect: ƒ.Rectangle = new ƒ.Rectangle(0, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
-      sprite.generateByGrid(startRect, 1, ƒ.Vector2.ZERO(), 15, ƒ.ORIGIN2D.BOTTOMLEFT);
+      sprite.generateByGrid(startRect, 1, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       BomberMan.animations[ACTION.IDLE + DIRECTION.UP] = sprite;
 
       sprite = new ƒAid.SpriteSheetAnimation(ACTION.IDLE + DIRECTION.DOWN, _coat);
@@ -61,7 +61,7 @@ namespace BomberMan {
 
       sprite = new ƒAid.SpriteSheetAnimation(ACTION.WALK + DIRECTION.UP, _coat);
       startRect = new ƒ.Rectangle(128, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
-      sprite.generateByGrid(startRect, 2, ƒ.Vector2.ZERO(), 15, ƒ.ORIGIN2D.BOTTOMLEFT);
+      sprite.generateByGrid(startRect, 2, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       BomberMan.animations[ACTION.WALK + DIRECTION.UP] = sprite;
 
       sprite = new ƒAid.SpriteSheetAnimation(ACTION.WALK + DIRECTION.DOWN, _coat);
@@ -70,7 +70,7 @@ namespace BomberMan {
       BomberMan.animations[ACTION.WALK + DIRECTION.DOWN] = sprite;
 
       sprite = new ƒAid.SpriteSheetAnimation(ACTION.WALK + DIRECTION.LEFT, _coat);
-      startRect = new ƒ.Rectangle(214, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
+      startRect = new ƒ.Rectangle(192, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       sprite.generateByGrid(startRect, 3, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       BomberMan.animations[ACTION.WALK + DIRECTION.LEFT] = sprite;
 

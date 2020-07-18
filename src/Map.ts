@@ -47,9 +47,8 @@ namespace BomberMan {
         case 2:
           tile = this.createBox(_pos);
           break;
-        case 3:
-          break;
         default:
+          tile = this.createGras(_pos);
           break;
       }
 

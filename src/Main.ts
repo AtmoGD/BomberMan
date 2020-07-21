@@ -15,9 +15,11 @@ namespace BomberMan {
 
     switch (page) {
       case "index.html":
+      case "":
         initStartScreen();
         break;
       case "Game":
+      case "Game.html":
         initGame();
         break;
       default:

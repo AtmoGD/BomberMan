@@ -14,9 +14,11 @@ var BomberMan;
         }
         switch (page) {
             case "index.html":
+            case "":
                 BomberMan.initStartScreen();
                 break;
             case "Game":
+            case "Game.html":
                 BomberMan.initGame();
                 break;
             default:

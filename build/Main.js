@@ -7,6 +7,7 @@ var BomberMan;
     function handleLoad() {
         let path = window.location.pathname;
         let page = path.split("/").pop();
+        console.log(page);
         if (!page) {
             BomberMan.initStartScreen();
             return;

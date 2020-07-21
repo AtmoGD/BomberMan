@@ -7,7 +7,7 @@ namespace BomberMan {
   function handleLoad(): void {
     let path: string = window.location.pathname;
     let page: string | undefined = path.split("/").pop();
-    
+    console.log(page);
     if (!page) {
       initStartScreen();
       return;

@@ -264,7 +264,7 @@ var BomberMan;
             sprite.generateByGrid(startRect, 2, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             BomberMan.animations[BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.DOWN] = sprite;
             sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.LEFT, _coat);
-            startRect = new BomberMan_1.ƒ.Rectangle(192, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
+            startRect = new BomberMan_1.ƒ.Rectangle(160, -16, 16, 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.generateByGrid(startRect, 3, BomberMan_1.ƒ.Vector2.ZERO(), 16, BomberMan_1.ƒ.ORIGIN2D.BOTTOMLEFT);
             BomberMan.animations[BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.LEFT] = sprite;
             sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.WALK + BomberMan_1.DIRECTION.RIGHT, _coat);

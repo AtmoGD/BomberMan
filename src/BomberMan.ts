@@ -73,7 +73,7 @@ namespace BomberMan {
       BomberMan.animations[ACTION.WALK + DIRECTION.DOWN] = sprite;
 
       sprite = new ƒAid.SpriteSheetAnimation(ACTION.WALK + DIRECTION.LEFT, _coat);
-      startRect = new ƒ.Rectangle(192, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
+      startRect = new ƒ.Rectangle(160, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       sprite.generateByGrid(startRect, 3, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       BomberMan.animations[ACTION.WALK + DIRECTION.LEFT] = sprite;
 

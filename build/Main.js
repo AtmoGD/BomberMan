@@ -47,8 +47,14 @@ var BomberMan;
         }
         explode() {
             this.map.data[this.position.y][this.position.x] = 0;
-            let explosion = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.UP, 3);
-            this.gameManager.graph.appendChild(explosion);
+            let up = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.UP, this.level);
+            this.gameManager.graph.appendChild(up);
+            let down = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.DOWN, this.level);
+            this.gameManager.graph.appendChild(down);
+            let left = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.LEFT, this.level);
+            this.gameManager.graph.appendChild(left);
+            let right = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.RIGHT, this.level);
+            this.gameManager.graph.appendChild(right);
             this.gameManager.graph.removeChild(this);
         }
         generateAnimations() {
@@ -104,7 +110,7 @@ var BomberMan;
     class Man extends BomberMan.ƒAid.NodeSprite {
         constructor(_map, _gameManager, _type, _name) {
             super(_name ? _name : "Man");
-            this.bombLevel = 1;
+            this.bombLevel = 3;
             this.bombSpeed = 1;
             this.canBomb = true;
             this.position = BomberMan.ƒ.Vector2.ZERO();
@@ -149,6 +155,9 @@ var BomberMan;
         generateSprites() {
             console.log("generateSprites");
         }
+        die() {
+            console.log("Wants to die");
+        }
         move(_dir) {
             if (this.distance > 0)
                 return;
@@ -189,11 +198,8 @@ var BomberMan;
             let mapData = this.map.data[bombPos.y][bombPos.x];
             if (mapData == 1 || mapData == 2)
                 return;
-            let bomb = new BomberMan.Bomb(this.map, this.gameManager, bombPos, 1);
+            let bomb = new BomberMan.Bomb(this.map, this.gameManager, bombPos, this.bombLevel);
             this.gameManager.graph.appendChild(bomb);
-        }
-        checkCollision(_pos) {
-            return false;
         }
         show(_action, _direction) {
             this.setAnimation(Man.animations[_action + _direction]);
@@ -207,7 +213,7 @@ var BomberMan;
 (function (BomberMan_1) {
     class BomberMan extends BomberMan_1.Man {
         constructor(_map, _gameManager, _name) {
-            super(_map, _gameManager, 4, _name ? _name : "BomberMan");
+            super(_map, _gameManager, 3, _name ? _name : "BomberMan");
             this.lives = 3;
             this.score = 0;
             this.initKeyEvent();
@@ -282,9 +288,30 @@ var BomberMan;
 var BomberMan;
 ///<reference path="Destroyable.ts"/>
 (function (BomberMan) {
-    class Box extends BomberMan.Destroyable {
-        constructor() {
-            super("Box");
+    class Box extends BomberMan.ƒAid.Node {
+        constructor(_y, _x, _map, _trans, _mesh) {
+            super("Box", BomberMan.ƒ.Matrix4x4.IDENTITY(), _map.getBoxMaterial(), _mesh);
+            this.map = _map;
+            this.trans = _trans;
+            this.x = _x;
+            this.y = _y;
+            this.pos = new BomberMan.ƒ.Vector2(_y, _x);
+            this.mat = this.getComponent(BomberMan.ƒ.ComponentMaterial);
+            let cmpTransform = this.getComponent(BomberMan.ƒ.ComponentTransform);
+            cmpTransform.local.translate(this.trans);
+        }
+        die() {
+            this.map.data[this.pos.x][this.pos.y] = 0;
+            this.mat.material = this.map.getGrasMaterial();
+            setTimeout(this.respawn.bind(this), BomberMan.Data.boxRespawnTime);
+        }
+        respawn() {
+            if (this.map.data[this.pos.x][this.pos.y] != 0) {
+                setTimeout(this.respawn.bind(this), BomberMan.Data.boxRespawnTime);
+                return;
+            }
+            this.map.data[this.pos.x][this.pos.y] = 2;
+            this.mat.material = this.map.getBoxMaterial();
         }
     }
     BomberMan.Box = Box;
@@ -294,7 +321,8 @@ var BomberMan;
     BomberMan.Data = {
         cameraDistance: 40,
         loopMode: BomberMan.ƒ.LOOP_MODE.TIME_REAL,
-        fps: 30
+        fps: 30,
+        boxRespawnTime: 10000
     };
     BomberMan.firstMap = [
         [1, 1, 1, 1, 1, 1],
@@ -310,7 +338,7 @@ var BomberMan;
     class Explosion extends BomberMan.ƒAid.NodeSprite {
         constructor(_gameManager, _map, _position, _dir, _count) {
             super("Explosion");
-            this.type = 3;
+            this.end = false;
             this.gameManager = _gameManager;
             this.map = _map;
             this.position = _position;
@@ -321,9 +349,50 @@ var BomberMan;
             this.mtxLocal.translation = pos;
             this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
             this.setAnimation(Explosion.animations["Explosion"]);
+            setTimeout(this.breed.bind(this), 100);
             setTimeout(this.die.bind(this), 1000);
+            let checkingType = this.map.data[this.position.y][this.position.x];
+            switch (checkingType) {
+                case 2:
+                    this.map.destroyBox(this.position);
+                    this.end = true;
+                    break;
+                case 3:
+                    this.gameManager.bomberman.die();
+                    this.end = true;
+                    break;
+                case 4:
+                    break;
+            }
         }
         breed() {
+            if (this.count <= 0)
+                return;
+            let pos = this.position.copy;
+            switch (this.dir) {
+                case BomberMan.DIRECTION.UP:
+                    if (this.map.data[this.position.y + 1][this.position.x] == 1)
+                        return;
+                    pos.y += 1;
+                    break;
+                case BomberMan.DIRECTION.DOWN:
+                    if (this.map.data[this.position.y - 1][this.position.x] == 1)
+                        return;
+                    pos.y -= 1;
+                    break;
+                case BomberMan.DIRECTION.LEFT:
+                    if (this.map.data[this.position.y][this.position.x - 1] == 1)
+                        return;
+                    pos.x -= 1;
+                    break;
+                case BomberMan.DIRECTION.RIGHT:
+                    if (this.map.data[this.position.y][this.position.x + 1] == 1)
+                        return;
+                    pos.x += 1;
+                    break;
+            }
+            let explosion = new Explosion(this.gameManager, this.map, pos, this.dir, this.count - 1);
+            this.gameManager.graph.appendChild(explosion);
         }
         die() {
             this.gameManager.graph.removeChild(this);
@@ -455,6 +524,7 @@ var BomberMan;
         constructor(_data) {
             super("Map");
             this.mapElements = [];
+            this.boxes = [];
             this.data = _data;
             for (let i = 0; i < this.data[0].length; i++)
                 this.mapElements[i] = [];
@@ -484,7 +554,8 @@ var BomberMan;
                     tile = this.createWallTop(_pos);
                     break;
                 case 2:
-                    tile = this.createBox(_pos);
+                    tile = this.createBox(_y, _x, _pos);
+                    this.boxes.push(tile);
                     break;
                 default:
                     tile = this.createGras(_pos);
@@ -508,11 +579,13 @@ var BomberMan;
         }
         createGras(_pos) {
             let mesh = new BomberMan.ƒ.MeshSprite();
-            let mtr = BomberMan.getTextureMaterial("Gras", Map.grasImg);
-            let gras = new BomberMan.ƒAid.Node("gras", BomberMan.ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+            let gras = new BomberMan.ƒAid.Node("gras", BomberMan.ƒ.Matrix4x4.IDENTITY(), this.getGrasMaterial(), mesh);
             let cmpTransform = gras.getComponent(BomberMan.ƒ.ComponentTransform);
             cmpTransform.local.translate(_pos);
             return gras;
+        }
+        getGrasMaterial() {
+            return BomberMan.getTextureMaterial("Gras", Map.grasImg);
         }
         createWallTop(_pos) {
             let mesh = new BomberMan.ƒ.MeshSprite();
@@ -522,13 +595,21 @@ var BomberMan;
             cmpTransform.local.translate(_pos);
             return wallt;
         }
-        createBox(_pos) {
+        createBox(_y, _x, _pos) {
             let mesh = new BomberMan.ƒ.MeshSprite();
-            let mtr = BomberMan.getTextureMaterial("Box", Map.boxImg);
-            let box = new BomberMan.ƒAid.Node("box", BomberMan.ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
-            let cmpTransform = box.getComponent(BomberMan.ƒ.ComponentTransform);
-            cmpTransform.local.translate(_pos);
-            return box;
+            return new BomberMan.Box(_y, _x, this, _pos, mesh);
+        }
+        destroyBox(_pos) {
+            this.boxes.forEach(box => {
+                if (box.x == _pos.x && box.y == _pos.y) {
+                    box.die();
+                }
+            });
+        }
+        getBoxMaterial() {
+            return BomberMan.getTextureMaterial("Box", Map.boxImg);
+        }
+        respawnBox(_pos) {
         }
         createWallSide() {
             let floor = new BomberMan.ƒ.Node("Floor");

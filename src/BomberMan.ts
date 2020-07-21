@@ -5,7 +5,7 @@ namespace BomberMan {
     private score: number = 0;
 
     constructor(_map: Map, _gameManager: GameManager, _name?: string) {
-      super(_map, _gameManager, 4, _name ? _name : "BomberMan");
+      super(_map, _gameManager, 3, _name ? _name : "BomberMan");
       this.initKeyEvent();
     }
 

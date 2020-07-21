@@ -65,6 +65,6 @@ namespace BomberMan {
       BomberMan.generateSprites(coat);
       Bomb.takeCoat(coat);
       Explosion.generateSprites(coat);
-        }
+    }
   }
 }

@@ -5,9 +5,9 @@ namespace BomberMan {
     private gameManager: GameManager;
     private position: ƒ.Vector2;
     private map: Map;
-    private type: number = 3;
     private dir: DIRECTION;
     private count: number;
+    private end: boolean = false;
 
     constructor(_gameManager: GameManager, _map: Map, _position: ƒ.Vector2, _dir: DIRECTION, _count: number) {
       super("Explosion");
@@ -23,13 +23,58 @@ namespace BomberMan {
       this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 1));
 
       this.setAnimation(<ƒAid.SpriteSheetAnimation>Explosion.animations["Explosion"]);
+
+      setTimeout(this.breed.bind(this), 100);
       setTimeout(this.die.bind(this), 1000);
+
+      let checkingType: number = this.map.data[this.position.y][this.position.x];
+      switch (checkingType) {
+        case 2:
+          this.map.destroyBox(this.position);
+          this.end = true;
+          break;
+        case 3:
+          this.gameManager.bomberman.die();
+          this.end = true;
+          break;
+        case 4:
+          break;
+      }
     }
 
     private breed(): void {
+      if (this.count <= 0)
+        return;
 
+      let pos: ƒ.Vector2 = this.position.copy;
+
+      switch (this.dir) {
+        case DIRECTION.UP:
+          if (this.map.data[this.position.y + 1][this.position.x] == 1)
+            return;
+          pos.y += 1;
+          break;
+        case DIRECTION.DOWN:
+          if (this.map.data[this.position.y - 1][this.position.x] == 1)
+            return;
+          pos.y -= 1;
+          break;
+        case DIRECTION.LEFT:
+          if (this.map.data[this.position.y][this.position.x - 1] == 1)
+            return;
+          pos.x -= 1;
+          break;
+        case DIRECTION.RIGHT:
+          if (this.map.data[this.position.y][this.position.x + 1] == 1)
+            return;
+          pos.x += 1;
+          break;
+      }
+
+      let explosion: Explosion = new Explosion(this.gameManager, this.map, pos, this.dir, this.count - 1);
+      this.gameManager.graph.appendChild(explosion);
     }
-    
+
     private die(): void {
       this.gameManager.graph.removeChild(this);
     }

@@ -37,12 +37,14 @@ namespace BomberMan {
     }
 
     private explode(): void {
+      let explosion: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.UP, 3);
+      this.gameManager.graph.appendChild(explosion);
       this.gameManager.graph.removeChild(this);
     }
     public generateAnimations(): void {
       this.animations = {};
 
-      let sprite: ƒAid.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation(ACTION.IDLE + DIRECTION.UP, Bomb.coat);
+      let sprite: ƒAid.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation("Bomb", Bomb.coat);
       let startRect: ƒ.Rectangle = new ƒ.Rectangle(48, 0, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       sprite.generateByGrid(startRect, 3, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
 

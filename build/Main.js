@@ -51,11 +51,13 @@ var BomberMan;
                 this.explode();
         }
         explode() {
+            let explosion = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.UP, 3);
+            this.gameManager.graph.appendChild(explosion);
             this.gameManager.graph.removeChild(this);
         }
         generateAnimations() {
             this.animations = {};
-            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.UP, Bomb.coat);
+            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation("Bomb", Bomb.coat);
             let startRect = new BomberMan.ƒ.Rectangle(48, 0, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.frames.forEach(frame => {
@@ -309,6 +311,33 @@ var BomberMan;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
+    class Explosion extends BomberMan.ƒAid.NodeSprite {
+        constructor(_gameManager, _map, _position, _dir, _count) {
+            super("Explosion");
+            this.type = 3;
+            this.gameManager = _gameManager;
+            this.map = _map;
+            this.position = _position;
+            this.dir = _dir;
+            this.count = _count;
+            this.addComponent(new BomberMan.ƒ.ComponentTransform());
+            let pos = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
+            this.mtxLocal.translation = pos;
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.setAnimation(Explosion.animations["Explosion"]);
+        }
+        static generateSprites(_coat) {
+            Explosion.animations = {};
+            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation("Explosion", _coat);
+            let startRect = new BomberMan.ƒ.Rectangle(0, 0, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            Explosion.animations["Explosion"] = sprite;
+        }
+    }
+    BomberMan.Explosion = Explosion;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
     let camera;
     let viewport;
     let graph;
@@ -410,6 +439,7 @@ var BomberMan;
             coat.texture.image = img;
             BomberMan.BomberMan.generateSprites(coat);
             BomberMan.Bomb.takeCoat(coat);
+            BomberMan.Explosion.generateSprites(coat);
         }
     }
     BomberMan.GameManager = GameManager;

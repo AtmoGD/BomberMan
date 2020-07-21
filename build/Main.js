@@ -7,11 +7,11 @@ var BomberMan;
     function handleLoad() {
         let path = window.location.pathname;
         let page = path.split("/").pop();
-        console.log(page);
         if (!page) {
             BomberMan.initStartScreen();
             return;
         }
+        console.log(page);
         switch (page) {
             case "index.html":
             case "":
@@ -425,6 +425,7 @@ var BomberMan;
     let startButton;
     // ƒ.RenderManager.initialize(true, true);
     function initGame() {
+        console.log("here");
         getReferences();
         installEventListener();
         camera = new BomberMan.ƒ.ComponentCamera();

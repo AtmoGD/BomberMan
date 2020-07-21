@@ -30,7 +30,7 @@ var BomberMan;
     class Bomb extends BomberMan.ƒAid.NodeSprite {
         constructor(_map, _gameManager, _position, _level) {
             super("Bomb");
-            this.lifetime = 100;
+            this.lifetime = 1000;
             this.type = 3;
             this.generateAnimations();
             this.level = _level;
@@ -43,14 +43,10 @@ var BomberMan;
             this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
             this.map.data[this.position.y][this.position.x] = this.type;
             this.setAnimation(this.animations["Explode"]);
-            BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
-        }
-        update() {
-            this.lifetime--;
-            if (this.lifetime <= 0)
-                this.explode();
+            setTimeout(this.explode.bind(this), this.lifetime);
         }
         explode() {
+            this.map.data[this.position.y][this.position.x] = 0;
             let explosion = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.UP, 3);
             this.gameManager.graph.appendChild(explosion);
             this.gameManager.graph.removeChild(this);
@@ -61,7 +57,7 @@ var BomberMan;
             let startRect = new BomberMan.ƒ.Rectangle(48, 0, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.frames.forEach(frame => {
-                frame.timeScale = 10;
+                frame.timeScale = this.lifetime * 4 / 1000;
             });
             this.animations["Explode"] = sprite;
         }
@@ -325,12 +321,19 @@ var BomberMan;
             this.mtxLocal.translation = pos;
             this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
             this.setAnimation(Explosion.animations["Explosion"]);
+            setTimeout(this.die.bind(this), 800);
+        }
+        die() {
+            this.gameManager.graph.removeChild(this);
         }
         static generateSprites(_coat) {
             Explosion.animations = {};
             let sprite = new BomberMan.ƒAid.SpriteSheetAnimation("Explosion", _coat);
             let startRect = new BomberMan.ƒ.Rectangle(0, 0, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.frames.forEach(frame => {
+                frame.timeScale = 3;
+            });
             Explosion.animations["Explosion"] = sprite;
         }
     }

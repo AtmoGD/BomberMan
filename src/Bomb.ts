@@ -5,7 +5,7 @@ namespace BomberMan {
 
     protected animations: ƒAid.SpriteSheetAnimations;
     private gameManager: GameManager;
-    private lifetime: number = 100;
+    private lifetime: number = 1000;
     private level: number;
     private position: ƒ.Vector2;
     private map: Map;
@@ -27,20 +27,16 @@ namespace BomberMan {
       this.map.data[this.position.y][this.position.x] = this.type;
 
       this.setAnimation(<ƒAid.SpriteSheetAnimation>this.animations["Explode"]);
-      ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.update.bind(this));
-    }
-
-    public update(): void {
-      this.lifetime--;
-      if (this.lifetime <= 0)
-        this.explode();
+      setTimeout(this.explode.bind(this), this.lifetime);
     }
 
     private explode(): void {
+      this.map.data[this.position.y][this.position.x] = 0;
       let explosion: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.UP, 3);
       this.gameManager.graph.appendChild(explosion);
       this.gameManager.graph.removeChild(this);
     }
+
     public generateAnimations(): void {
       this.animations = {};
 
@@ -49,7 +45,7 @@ namespace BomberMan {
       sprite.generateByGrid(startRect, 3, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
 
       sprite.frames.forEach(frame => {
-        frame.timeScale = 10;
+        frame.timeScale = this.lifetime * 4 / 1000;
       });
 
       this.animations["Explode"] = sprite;

@@ -23,12 +23,17 @@ namespace BomberMan {
       this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 1));
 
       this.setAnimation(<ƒAid.SpriteSheetAnimation>Explosion.animations["Explosion"]);
-      setTimeout(this.die.bind(this), 800);
+      setTimeout(this.die.bind(this), 1000);
     }
 
+    private breed(): void {
+
+    }
+    
     private die(): void {
       this.gameManager.graph.removeChild(this);
     }
+
     public static generateSprites(_coat: ƒ.CoatTextured): void {
       Explosion.animations = {};
 
@@ -37,7 +42,7 @@ namespace BomberMan {
       sprite.generateByGrid(startRect, 3, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
 
       sprite.frames.forEach(frame => {
-        frame.timeScale = 3;
+        frame.timeScale = 4;
       });
 
       Explosion.animations["Explosion"] = sprite;

@@ -321,7 +321,7 @@ var BomberMan;
             this.mtxLocal.translation = pos;
             this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
             this.setAnimation(Explosion.animations["Explosion"]);
-            setTimeout(this.die.bind(this), 800);
+            setTimeout(this.die.bind(this), 1000);
         }
         die() {
             this.gameManager.graph.removeChild(this);
@@ -332,7 +332,7 @@ var BomberMan;
             let startRect = new BomberMan.ƒ.Rectangle(0, 0, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
             sprite.frames.forEach(frame => {
-                frame.timeScale = 3;
+                frame.timeScale = 4;
             });
             Explosion.animations["Explosion"] = sprite;
         }

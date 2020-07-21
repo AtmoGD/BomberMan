@@ -323,6 +323,8 @@ var BomberMan;
             this.setAnimation(Explosion.animations["Explosion"]);
             setTimeout(this.die.bind(this), 1000);
         }
+        breed() {
+        }
         die() {
             this.gameManager.graph.removeChild(this);
         }

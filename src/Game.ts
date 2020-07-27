@@ -1,5 +1,10 @@
 namespace BomberMan {
 
+  interface Data {
+    cameraDistance: number,
+    fps: number
+  }
+
   let camera: ƒ.ComponentCamera;
   let viewport: ƒ.Viewport;
   let graph: ƒ.Node;
@@ -12,16 +17,20 @@ namespace BomberMan {
 
   let startButton: HTMLButtonElement;
 
+  export let data: Data;
+
   // ƒ.RenderManager.initialize(true, true);
 
-  export function initGame(): void {
-
-    console.log("here");
+  export async function initGame(): Promise<void> {
     getReferences();
     installEventListener();
 
+    await loadData();
+
+    console.log(data);
+
     camera = new ƒ.ComponentCamera();
-    camera.pivot.translateZ(Data.cameraDistance);
+    camera.pivot.translateZ(data.cameraDistance);
     camera.pivot.rotateY(180);
 
     let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(1, 1, 0);
@@ -45,6 +54,11 @@ namespace BomberMan {
 
   function update(): void {
     viewport.draw();
+  }
+
+  async function loadData(): Promise<void> {
+    let rawData: Response = await fetch("../src/Data.json");
+    data = JSON.parse(await rawData.text());
   }
 
   function getReferences(): void {

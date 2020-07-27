@@ -338,6 +338,53 @@ var BomberMan;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
+    class EnemyMan extends BomberMan.Man {
+        constructor(_map, _gameManager, _name) {
+            super(_map, _gameManager, 3, _name ? _name : "BomberMan");
+        }
+        static generateSprites(_coat) {
+            BomberMan.BomberMan.animations = {};
+            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.UP, _coat);
+            let startRect = new BomberMan.ƒ.Rectangle(0, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.UP] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.DOWN, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(16, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.DOWN] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.LEFT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(208, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.LEFT] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.RIGHT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(64, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.RIGHT] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.UP, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(128, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 2, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.UP] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.DOWN, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(32, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 2, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.DOWN] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.LEFT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(160, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.LEFT] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.RIGHT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(80, -16, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            BomberMan.BomberMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.RIGHT] = sprite;
+        }
+        show(_action, _direction) {
+            this.setAnimation(BomberMan.BomberMan.animations[_action + _direction]);
+        }
+    }
+    BomberMan.EnemyMan = EnemyMan;
+})(BomberMan || (BomberMan = {}));
+var BomberMan;
+(function (BomberMan) {
     class Explosion extends BomberMan.ƒAid.NodeSprite {
         constructor(_gameManager, _map, _position, _dir, _count) {
             super("Explosion");
@@ -424,12 +471,13 @@ var BomberMan;
     let gameOverOverlay;
     let startButton;
     // ƒ.RenderManager.initialize(true, true);
-    function initGame() {
-        console.log("here");
+    async function initGame() {
         getReferences();
         installEventListener();
+        await loadData();
+        console.log(BomberMan.data);
         camera = new BomberMan.ƒ.ComponentCamera();
-        camera.pivot.translateZ(BomberMan.Data.cameraDistance);
+        camera.pivot.translateZ(BomberMan.data.cameraDistance);
         camera.pivot.rotateY(180);
         let cameraLookAt = new BomberMan.ƒ.Vector3(1, 1, 0);
         camera.pivot.lookAt(cameraLookAt);
@@ -447,6 +495,10 @@ var BomberMan;
     BomberMan.initGame = initGame;
     function update() {
         viewport.draw();
+    }
+    async function loadData() {
+        let rawData = await fetch("../src/Data.json");
+        BomberMan.data = JSON.parse(await rawData.text());
     }
     function getReferences() {
         startOverlay = document.querySelector("#startOverlay");
@@ -620,12 +672,6 @@ var BomberMan;
         }
         getBoxMaterial() {
             return BomberMan.getTextureMaterial("Box", Map.boxImg);
-        }
-        respawnBox(_pos) {
-        }
-        createWallSide() {
-            let floor = new BomberMan.ƒ.Node("Floor");
-            return floor;
         }
     }
     BomberMan.Map = Map;

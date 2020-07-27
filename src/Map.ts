@@ -127,14 +127,5 @@ namespace BomberMan {
     public getBoxMaterial(): ƒ.Material {
       return getTextureMaterial("Box", Map.boxImg);
     }
-
-    public respawnBox(_pos: ƒAid.Node): void {
-
-    }
-
-    private createWallSide(): ƒ.Node {
-      let floor: ƒ.Node = new ƒ.Node("Floor");
-      return floor;
-    }
   }
 }

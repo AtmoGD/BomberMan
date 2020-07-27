@@ -6,8 +6,8 @@ namespace BomberMan {
 
     public map: Map = null;
     public mans: Man[] = [];
-    public destroyables: Destroyable[] = [];
     public bomberman: BomberMan = null;
+    public enemy: EnemyMan[] = [];
 
     private gameOver: boolean = false;
 
@@ -20,39 +20,22 @@ namespace BomberMan {
 
     public startGame(): void {
       Map.loadImages();
-      this.map = MapGenerator.generateRandomMap(21);
-      this.graph.appendChild(this.map);
-
       this.loadSprites();
+
+      this.map = MapGenerator.generateRandomMap(21);
+      
       this.bomberman = new BomberMan(this.map, this, "Bomberman");
+
+      for(let i: number = 0; i < data.enemyCount; i++) {
+        let newEnemy: EnemyMan = new EnemyMan(this.map, this, "EnemyMan");
+        this.enemy.push(newEnemy);
+        this.graph.appendChild(newEnemy);
+      }
+  
+      this.graph.appendChild(this.map);
       this.graph.appendChild(this.bomberman);
-
     }
-    public checkCollisionAll(_target: ƒ.Vector3): Man | Destroyable | null {
-
-      let restDest: Destroyable | null = this.checkCollisionDestroyables(_target);
-      let restMan: Man | null = this.checkCollisionMans(_target);
-      return restDest ? restDest : restMan;
-    }
-
-    public checkCollisionDestroyables(_pos: ƒ.Vector3): Destroyable | null {
-      for (let dest of this.destroyables) {
-        if (dest.mtxLocal.translation.isInsideSphere(_pos, 1)) {
-          return dest;
-        }
-      }
-      return null;
-    }
-
-    public checkCollisionMans(_pos: ƒ.Vector3): Man | null {
-      for (let man of this.mans) {
-        if (man.mtxLocal.translation.isInsideSphere(_pos, 1)) {
-          return man;
-        }
-      }
-      return null;
-    }
-
+    
     public getMap(): Map {
       return this.map;
     }
@@ -63,6 +46,7 @@ namespace BomberMan {
       coat.texture = new ƒ.TextureImage();
       coat.texture.image = img;
       BomberMan.generateSprites(coat);
+      EnemyMan.generateSprites(coat);
       Bomb.takeCoat(coat);
       Explosion.generateSprites(coat);
     }

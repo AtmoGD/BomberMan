@@ -3,7 +3,8 @@ namespace BomberMan {
   interface Data {
     cameraDistance: number,
     fps: number,
-    boxRespawnTime: number
+    boxRespawnTime: number,
+    enemyCount: number
   }
 
   let camera: ƒ.ComponentCamera;

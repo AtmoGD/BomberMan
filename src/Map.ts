@@ -65,8 +65,10 @@ namespace BomberMan {
       let x: number = Math.floor(Math.random() * this.data[0].length);
       let y: number = Math.floor(Math.random() * this.data.length);
 
-      if (this.data[y][x] == 0)
+      if (this.data[y][x] == 0) {
+        this.data[y][x] = _type;
         return new ƒ.Vector2(x, y);
+      }
       else
         return this.getRandomSpawnPoint(_type);
     }

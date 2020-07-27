@@ -1,5 +1,6 @@
 {
   "cameraDistance": 40,
   "fps": 30,
-  "boxRespawnTime": 1000
+  "boxRespawnTime": 10000,
+  "enemyCount": 3
 }

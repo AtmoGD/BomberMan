@@ -32,6 +32,8 @@ namespace BomberMan {
       this.gameManager = _gameManager;
       this.position = this.map.getRandomSpawnPoint(this.type);
 
+      console.log(this.map.data);
+
       this.transform = new ƒ.ComponentTransform();
       this.addComponent(this.transform);
       this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
@@ -93,7 +95,7 @@ namespace BomberMan {
       }
 
       let mapData: number = this.map.data[newPos.y][newPos.x];
-      if (mapData == 1 || mapData == 2 || mapData == 3)
+      if (mapData != 0)
         return;
 
       this.map.data[this.position.y][this.position.x] = 0;

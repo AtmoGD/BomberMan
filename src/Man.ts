@@ -45,7 +45,7 @@ namespace BomberMan {
     public update(): void {
 
       if (this.distance > 0) {
-        let dist: number = (1 / Data.fps) * this.speed;
+        let dist: number = (1 / data.fps) * this.speed;
         dist = dist > this.distance ? this.distance : dist;
         switch (this.direc) {
           case DIRECTION.UP:

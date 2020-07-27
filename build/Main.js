@@ -133,7 +133,7 @@ var BomberMan;
         }
         update() {
             if (this.distance > 0) {
-                let dist = (1 / BomberMan.Data.fps) * this.speed;
+                let dist = (1 / BomberMan.data.fps) * this.speed;
                 dist = dist > this.distance ? this.distance : dist;
                 switch (this.direc) {
                     case DIRECTION.UP:
@@ -306,11 +306,11 @@ var BomberMan;
         die() {
             this.map.data[this.pos.x][this.pos.y] = 0;
             this.mat.material = this.map.getGrasMaterial();
-            setTimeout(this.respawn.bind(this), BomberMan.Data.boxRespawnTime);
+            setTimeout(this.respawn.bind(this), Data.boxRespawnTime);
         }
         respawn() {
             if (this.map.data[this.pos.x][this.pos.y] != 0) {
-                setTimeout(this.respawn.bind(this), BomberMan.Data.boxRespawnTime);
+                setTimeout(this.respawn.bind(this), Data.boxRespawnTime);
                 return;
             }
             this.map.data[this.pos.x][this.pos.y] = 2;
@@ -318,23 +318,6 @@ var BomberMan;
         }
     }
     BomberMan.Box = Box;
-})(BomberMan || (BomberMan = {}));
-var BomberMan;
-(function (BomberMan) {
-    BomberMan.Data = {
-        cameraDistance: 40,
-        loopMode: BomberMan.ƒ.LOOP_MODE.TIME_REAL,
-        fps: 30,
-        boxRespawnTime: 10000
-    };
-    BomberMan.firstMap = [
-        [1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1],
-    ];
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
@@ -475,7 +458,6 @@ var BomberMan;
         getReferences();
         installEventListener();
         await loadData();
-        console.log(BomberMan.data);
         camera = new BomberMan.ƒ.ComponentCamera();
         camera.pivot.translateZ(BomberMan.data.cameraDistance);
         camera.pivot.rotateY(180);
@@ -490,7 +472,7 @@ var BomberMan;
         let gizmo = new BomberMan.ƒAid.NodeCoordinateSystem("ControlSystem");
         graph.addChild(gizmo);
         BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        BomberMan.ƒ.Loop.start(BomberMan.Data.loopMode, BomberMan.Data.fps);
+        BomberMan.ƒ.Loop.start(BomberMan.ƒ.LOOP_MODE.TIME_REAL, BomberMan.data.fps);
     }
     BomberMan.initGame = initGame;
     function update() {

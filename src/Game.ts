@@ -2,7 +2,8 @@ namespace BomberMan {
 
   interface Data {
     cameraDistance: number,
-    fps: number
+    fps: number,
+    boxRespawnTime: number
   }
 
   let camera: ƒ.ComponentCamera;
@@ -27,8 +28,6 @@ namespace BomberMan {
 
     await loadData();
 
-    console.log(data);
-
     camera = new ƒ.ComponentCamera();
     camera.pivot.translateZ(data.cameraDistance);
     camera.pivot.rotateY(180);
@@ -49,7 +48,7 @@ namespace BomberMan {
     graph.addChild(gizmo);
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
-    ƒ.Loop.start(Data.loopMode, Data.fps);
+    ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, data.fps);
   }
 
   function update(): void {

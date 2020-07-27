@@ -1,4 +1,5 @@
 {
   "cameraDistance": 40,
-  "fps": 30
+  "fps": 30,
+  "boxRespawnTime": 1000
 }

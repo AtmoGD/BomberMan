@@ -24,6 +24,7 @@ namespace BomberMan {
     protected direc: DIRECTION = DIRECTION.DOWN;
     protected distance: number = 0;
     protected transform: ƒ.ComponentTransform;
+    protected dead: boolean = false;
 
     constructor(_map: Map, _gameManager: GameManager, _type: number, _name?: string) {
       super(_name ? _name : "Man");
@@ -43,6 +44,9 @@ namespace BomberMan {
 
 
     protected update(): void {
+      if (this.dead)
+        return;
+        
       this.movement();
     }
 
@@ -134,7 +138,7 @@ namespace BomberMan {
       this.gameManager.graph.appendChild(bomb);
 
       this.canBomb = false;
-      setTimeout(()=>{this.canBomb = true}, this.bombSpeed * 1000);
+      setTimeout(() => { this.canBomb = true }, this.bombSpeed * 1000);
     }
 
     public show(_action: ACTION, _direction: DIRECTION): void {

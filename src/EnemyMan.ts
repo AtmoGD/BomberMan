@@ -9,6 +9,9 @@ namespace BomberMan {
     }
 
     protected update(): void {
+      if (this.dead)
+        return;
+
       super.update();
 
       if (this.distance == 0)
@@ -16,7 +19,7 @@ namespace BomberMan {
     }
 
     public die(): void {
-      ƒ.Loop.removeEventListener(ƒ.LOOP_MODE.TIME_REAL, this.update);
+      this.dead = true;
       this.gameManager.graph.removeChild(this);
     }
 

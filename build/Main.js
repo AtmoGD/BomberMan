@@ -120,6 +120,7 @@ var BomberMan;
             this.speed = 4;
             this.direc = DIRECTION.DOWN;
             this.distance = 0;
+            this.dead = false;
             this.map = _map;
             this.type = _type;
             this.gameManager = _gameManager;
@@ -132,6 +133,8 @@ var BomberMan;
             BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
         }
         update() {
+            if (this.dead)
+                return;
             this.movement();
         }
         generateSprites() {
@@ -338,12 +341,14 @@ var BomberMan;
             this.bombSpeed = BomberMan.data.enemyBombSpeed;
         }
         update() {
+            if (this.dead)
+                return;
             super.update();
             if (this.distance == 0)
                 this.decideAction();
         }
         die() {
-            BomberMan.ƒ.Loop.removeEventListener(BomberMan.ƒ.LOOP_MODE.TIME_REAL, this.update);
+            this.dead = true;
             this.gameManager.graph.removeChild(this);
         }
         decideAction() {

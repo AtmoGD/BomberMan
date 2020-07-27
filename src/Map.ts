@@ -15,7 +15,7 @@ namespace BomberMan {
 
       for (let i: number = 0; i < this.data[0].length; i++)
         this.mapElements[i] = [];
-      
+
       this.generateMap();
     }
 
@@ -58,10 +58,20 @@ namespace BomberMan {
       }
     }
 
+    public getRandomSpawnPoint(_type: number): ƒ.Vector2 {
+      let x: number = Math.floor(Math.random() * this.data[0].length);
+      let y: number = Math.floor(Math.random() * this.data.length);
+
+      if (this.data[y][x] == 0)
+        return new ƒ.Vector2(x, y);
+      else
+        return this.getRandomSpawnPoint(_type);
+    }
+
     public createSpawnPoint(_type: number): ƒ.Vector2 {
       for (let y: number = 0; y < this.data.length; y++) {
         for (let x: number = 0; x < this.data[y].length; x++) {
-          if (this.data[y][x] == 0 && this.data[y][x + 1] == 0 && this.data[y + 1][x] == 0){
+          if (this.data[y][x] == 0 && this.data[y][x + 1] == 0 && this.data[y + 1][x] == 0) {
             this.data[y][x] = _type;
             return new ƒ.Vector2(x, y);
           }

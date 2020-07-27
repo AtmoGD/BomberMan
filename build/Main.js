@@ -114,7 +114,7 @@ var BomberMan;
             this.map = _map;
             this.type = _type;
             this.gameManager = _gameManager;
-            this.position = this.map.createSpawnPoint(this.type);
+            this.position = this.map.getRandomSpawnPoint(this.type);
             this.transform = new BomberMan.ƒ.ComponentTransform();
             this.addComponent(this.transform);
             this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
@@ -492,6 +492,14 @@ var BomberMan;
                 this.appendChild(tile);
                 this.mapElements[_y][_x] = tile;
             }
+        }
+        getRandomSpawnPoint(_type) {
+            let x = Math.floor(Math.random() * this.data[0].length);
+            let y = Math.floor(Math.random() * this.data.length);
+            if (this.data[y][x] == 0)
+                return new BomberMan.ƒ.Vector2(x, y);
+            else
+                return this.getRandomSpawnPoint(_type);
         }
         createSpawnPoint(_type) {
             for (let y = 0; y < this.data.length; y++) {

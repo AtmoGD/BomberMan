@@ -30,7 +30,7 @@ namespace BomberMan {
       this.map = _map;
       this.type = _type;
       this.gameManager = _gameManager;
-      this.position = this.map.createSpawnPoint(this.type);
+      this.position = this.map.getRandomSpawnPoint(this.type);
 
       this.transform = new ƒ.ComponentTransform();
       this.addComponent(this.transform);

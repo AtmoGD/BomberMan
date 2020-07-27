@@ -4,7 +4,10 @@ namespace BomberMan {
     cameraDistance: number,
     fps: number,
     boxRespawnTime: number,
-    enemyCount: number
+    enemyCount: number,
+    enemySpeed: number,
+    enemyRange: number,
+    enemyBombSpeed: number
   }
 
   let camera: ƒ.ComponentCamera;

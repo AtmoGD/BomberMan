@@ -1,7 +1,60 @@
 namespace BomberMan {
   export class EnemyMan extends Man {
+    private wait: boolean = false;
+
     constructor(_map: Map, _gameManager: GameManager, _name?: string) {
       super(_map, _gameManager, 5, _name ? _name : "BomberMan");
+      this.speed = data.enemySpeed;
+      this.bombSpeed = data.enemyBombSpeed;
+    }
+
+    protected update(): void {
+      super.update();
+
+      if (this.distance == 0)
+        this.decideAction();
+    }
+
+    public die(): void {
+      ƒ.Loop.removeEventListener(ƒ.LOOP_MODE.TIME_REAL, this.update);
+      this.gameManager.graph.removeChild(this);
+    }
+
+    private decideAction(): void {
+      if (this.wait)
+        return;
+
+      if (this.checkIfPlayerIsInRange())
+        this.placeBomb();
+
+      let rndDirection: number = Math.floor(Math.random() * 5);
+      switch (rndDirection) {
+        case 0:
+          this.move(DIRECTION.UP);
+          break;
+        case 1:
+          this.move(DIRECTION.DOWN);
+          break;
+        case 2:
+          this.move(DIRECTION.LEFT);
+          break;
+        case 3:
+          this.move(DIRECTION.RIGHT);
+          break;
+        case 4:
+          this.wait = true;
+          setTimeout(() => { this.wait = false }, Math.random() * 1000);
+          break;
+      }
+    }
+
+    private checkIfPlayerIsInRange(): boolean {
+      let playerPosition: ƒ.Vector2 = this.gameManager.bomberman.getPosition();
+      playerPosition.subtract(this.position);
+
+      if (playerPosition.magnitude < data.enemyRange)
+        return true;
+      return false;
     }
 
     public static generateSprites(_coat: ƒ.CoatTextured): void {

@@ -2,5 +2,8 @@
   "cameraDistance": 40,
   "fps": 30,
   "boxRespawnTime": 10000,
-  "enemyCount": 3
+  "enemyCount": 3,
+  "enemySpeed": 2,
+  "enemyRange": 4,
+  "enemyBombSpeed": 3
 }

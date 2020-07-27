@@ -124,7 +124,6 @@ var BomberMan;
             this.type = _type;
             this.gameManager = _gameManager;
             this.position = this.map.getRandomSpawnPoint(this.type);
-            console.log(this.map.data);
             this.transform = new BomberMan.ƒ.ComponentTransform();
             this.addComponent(this.transform);
             this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
@@ -133,6 +132,18 @@ var BomberMan;
             BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
         }
         update() {
+            this.movement();
+        }
+        generateSprites() {
+            console.log("generateSprites");
+        }
+        die() {
+            console.log("Wants to die");
+        }
+        getPosition() {
+            return this.position.copy;
+        }
+        movement() {
             if (this.distance > 0) {
                 let dist = (1 / BomberMan.data.fps) * this.speed;
                 dist = dist > this.distance ? this.distance : dist;
@@ -155,12 +166,6 @@ var BomberMan;
             else {
                 this.show(ACTION.IDLE, this.direc);
             }
-        }
-        generateSprites() {
-            console.log("generateSprites");
-        }
-        die() {
-            console.log("Wants to die");
         }
         move(_dir) {
             if (this.distance > 0)
@@ -187,7 +192,8 @@ var BomberMan;
             this.show(ACTION.WALK, this.direc);
         }
         placeBomb() {
-            console.log("Want to place a bomb");
+            if (!this.canBomb)
+                return;
             let bombPos = this.position.copy;
             switch (this.direc) {
                 case DIRECTION.UP:
@@ -204,6 +210,8 @@ var BomberMan;
                 return;
             let bomb = new BomberMan.Bomb(this.map, this.gameManager, bombPos, this.bombLevel);
             this.gameManager.graph.appendChild(bomb);
+            this.canBomb = false;
+            setTimeout(() => { this.canBomb = true; }, this.bombSpeed * 1000);
         }
         show(_action, _direction) {
             this.setAnimation(Man.animations[_action + _direction]);
@@ -325,6 +333,50 @@ var BomberMan;
     class EnemyMan extends BomberMan.Man {
         constructor(_map, _gameManager, _name) {
             super(_map, _gameManager, 5, _name ? _name : "BomberMan");
+            this.wait = false;
+            this.speed = BomberMan.data.enemySpeed;
+            this.bombSpeed = BomberMan.data.enemyBombSpeed;
+        }
+        update() {
+            super.update();
+            if (this.distance == 0)
+                this.decideAction();
+        }
+        die() {
+            BomberMan.ƒ.Loop.removeEventListener(BomberMan.ƒ.LOOP_MODE.TIME_REAL, this.update);
+            this.gameManager.graph.removeChild(this);
+        }
+        decideAction() {
+            if (this.wait)
+                return;
+            if (this.checkIfPlayerIsInRange())
+                this.placeBomb();
+            let rndDirection = Math.floor(Math.random() * 5);
+            switch (rndDirection) {
+                case 0:
+                    this.move(BomberMan.DIRECTION.UP);
+                    break;
+                case 1:
+                    this.move(BomberMan.DIRECTION.DOWN);
+                    break;
+                case 2:
+                    this.move(BomberMan.DIRECTION.LEFT);
+                    break;
+                case 3:
+                    this.move(BomberMan.DIRECTION.RIGHT);
+                    break;
+                case 4:
+                    this.wait = true;
+                    setTimeout(() => { this.wait = false; }, Math.random() * 1000);
+                    break;
+            }
+        }
+        checkIfPlayerIsInRange() {
+            let playerPosition = this.gameManager.bomberman.getPosition();
+            playerPosition.subtract(this.position);
+            if (playerPosition.magnitude < BomberMan.data.enemyRange)
+                return true;
+            return false;
         }
         static generateSprites(_coat) {
             EnemyMan.animations = {};
@@ -391,11 +443,13 @@ var BomberMan;
                     this.map.destroyBox(this.position);
                     this.end = true;
                     break;
-                case 3:
+                case 4:
                     this.gameManager.bomberman.die();
                     this.end = true;
                     break;
-                case 4:
+                case 5:
+                    let enemy = this.gameManager.getEnemy(this.position);
+                    enemy.die();
                     break;
             }
         }
@@ -507,7 +561,7 @@ var BomberMan;
             this.map = null;
             this.mans = [];
             this.bomberman = null;
-            this.enemy = [];
+            this.enemys = [];
             this.gameOver = false;
             this.viewport = _viewport;
             this.graph = _graph;
@@ -520,7 +574,7 @@ var BomberMan;
             this.bomberman = new BomberMan.BomberMan(this.map, this, "Bomberman");
             for (let i = 0; i < BomberMan.data.enemyCount; i++) {
                 let newEnemy = new BomberMan.EnemyMan(this.map, this, "EnemyMan");
-                this.enemy.push(newEnemy);
+                this.enemys.push(newEnemy);
                 this.graph.appendChild(newEnemy);
             }
             this.graph.appendChild(this.map);
@@ -528,6 +582,14 @@ var BomberMan;
         }
         getMap() {
             return this.map;
+        }
+        getEnemy(_position) {
+            for (let enemy of this.enemys) {
+                let enemyPos = enemy.getPosition();
+                if (_position.x == enemyPos.x && _position.y == enemyPos.y)
+                    return enemy;
+            }
+            return null;
         }
         loadSprites() {
             let img = document.querySelector("#spritesheet");

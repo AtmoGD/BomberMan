@@ -33,11 +33,13 @@ namespace BomberMan {
           this.map.destroyBox(this.position);
           this.end = true;
           break;
-        case 3:
+        case 4:
           this.gameManager.bomberman.die();
           this.end = true;
           break;
-        case 4:
+        case 5:
+          let enemy: EnemyMan = this.gameManager.getEnemy(this.position);
+          enemy.die();
           break;
       }
     }

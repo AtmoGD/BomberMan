@@ -32,8 +32,6 @@ namespace BomberMan {
       this.gameManager = _gameManager;
       this.position = this.map.getRandomSpawnPoint(this.type);
 
-      console.log(this.map.data);
-
       this.transform = new ƒ.ComponentTransform();
       this.addComponent(this.transform);
       this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
@@ -44,8 +42,23 @@ namespace BomberMan {
     }
 
 
-    public update(): void {
+    protected update(): void {
+      this.movement();
+    }
 
+    public generateSprites(): void {
+      console.log("generateSprites");
+    }
+
+    public die(): void {
+      console.log("Wants to die");
+    }
+
+    public getPosition(): ƒ.Vector2 {
+      return this.position.copy;
+    }
+
+    protected movement(): void {
       if (this.distance > 0) {
         let dist: number = (1 / data.fps) * this.speed;
         dist = dist > this.distance ? this.distance : dist;
@@ -68,15 +81,6 @@ namespace BomberMan {
         this.show(ACTION.IDLE, this.direc);
       }
     }
-
-    public generateSprites(): void {
-      console.log("generateSprites");
-    }
-
-    public die(): void {
-      console.log("Wants to die");
-    }
-
     protected move(_dir: DIRECTION): void {
 
       if (this.distance > 0)
@@ -108,7 +112,9 @@ namespace BomberMan {
     }
 
     public placeBomb(): void {
-      console.log("Want to place a bomb");
+      if (!this.canBomb)
+        return;
+
       let bombPos: ƒ.Vector2 = this.position.copy;
       switch (this.direc) {
         case DIRECTION.UP:
@@ -126,6 +132,9 @@ namespace BomberMan {
 
       let bomb: Bomb = new Bomb(this.map, this.gameManager, bombPos, this.bombLevel);
       this.gameManager.graph.appendChild(bomb);
+
+      this.canBomb = false;
+      setTimeout(()=>{this.canBomb = true}, this.bombSpeed * 1000);
     }
 
     public show(_action: ACTION, _direction: DIRECTION): void {

@@ -16,6 +16,7 @@ namespace BomberMan {
 
   export function initGame(): void {
 
+    console.log("here");
     getReferences();
     installEventListener();
 

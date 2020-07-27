@@ -5,7 +5,7 @@ namespace BomberMan {
     private score: number = 0;
 
     constructor(_map: Map, _gameManager: GameManager, _name?: string) {
-      super(_map, _gameManager, 4, _name ? _name : "BomberMan");
+      super(_map, _gameManager, 3, _name ? _name : "BomberMan");
       this.initKeyEvent();
     }
 
@@ -73,7 +73,7 @@ namespace BomberMan {
       BomberMan.animations[ACTION.WALK + DIRECTION.DOWN] = sprite;
 
       sprite = new ƒAid.SpriteSheetAnimation(ACTION.WALK + DIRECTION.LEFT, _coat);
-      startRect = new ƒ.Rectangle(192, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
+      startRect = new ƒ.Rectangle(160, -16, 16, 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       sprite.generateByGrid(startRect, 3, ƒ.Vector2.ZERO(), 16, ƒ.ORIGIN2D.BOTTOMLEFT);
       BomberMan.animations[ACTION.WALK + DIRECTION.LEFT] = sprite;
 

@@ -1,4 +1,5 @@
 namespace BomberMan {
+
   export class Map extends ƒAid.Node {
     public static grasImg: HTMLImageElement;
     public static boxImg: HTMLImageElement;
@@ -7,6 +8,7 @@ namespace BomberMan {
 
     public data: number[][];
     public mapElements: ƒAid.Node[][] = [];
+    private boxes: Box[] = []
 
     constructor(_data: number[][]) {
       super("Map");
@@ -36,7 +38,7 @@ namespace BomberMan {
     }
 
     private createTile(_y: number, _x: number, _pos: ƒ.Vector3) {
-      let tile: ƒAid.Node = null;
+      let tile: ƒAid.Node | Box = null;
       switch (this.data[_y][_x]) {
         case 0:
           tile = this.createGras(_pos);
@@ -45,7 +47,8 @@ namespace BomberMan {
           tile = this.createWallTop(_pos);
           break;
         case 2:
-          tile = this.createBox(_pos);
+          tile = this.createBox(_y, _x, _pos);
+          this.boxes.push(<Box>tile);
           break;
         default:
           tile = this.createGras(_pos);
@@ -82,14 +85,18 @@ namespace BomberMan {
 
     public createGras(_pos: ƒ.Vector3): ƒAid.Node {
       let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
-      let mtr: ƒ.Material = getTextureMaterial("Gras", Map.grasImg);
 
-      let gras: ƒAid.Node = new ƒAid.Node("gras", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+      let gras: ƒAid.Node = new ƒAid.Node("gras", ƒ.Matrix4x4.IDENTITY(), this.getGrasMaterial(), mesh);
 
       let cmpTransform: ƒ.ComponentTransform = gras.getComponent(ƒ.ComponentTransform);
       cmpTransform.local.translate(_pos);
 
       return gras;
+    }
+
+    public getGrasMaterial(): ƒ.Material {
+      return getTextureMaterial("Gras", Map.grasImg);
+
     }
 
     public createWallTop(_pos: ƒ.Vector3): ƒAid.Node {
@@ -104,16 +111,25 @@ namespace BomberMan {
       return wallt;
     }
 
-    public createBox(_pos: ƒ.Vector3): ƒAid.Node {
+    public createBox(_y: number, _x: number, _pos: ƒ.Vector3): Box {
       let mesh: ƒ.MeshSprite = new ƒ.MeshSprite();
-      let mtr: ƒ.Material = getTextureMaterial("Box", Map.boxImg);
+      return new Box(_y, _x, this, _pos, mesh);
+    }
 
-      let box: ƒAid.Node = new ƒAid.Node("box", ƒ.Matrix4x4.IDENTITY(), mtr, mesh);
+    public destroyBox(_pos: ƒ.Vector2): void {
+      this.boxes.forEach(box =>{
+        if (box.x == _pos.x && box.y == _pos.y) {
+          box.die();
+        }
+      })
+    }
 
-      let cmpTransform: ƒ.ComponentTransform = box.getComponent(ƒ.ComponentTransform);
-      cmpTransform.local.translate(_pos);
+    public getBoxMaterial(): ƒ.Material {
+      return getTextureMaterial("Box", Map.boxImg);
+    }
 
-      return box;
+    public respawnBox(_pos: ƒAid.Node): void {
+
     }
 
     private createWallSide(): ƒ.Node {

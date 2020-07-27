@@ -13,7 +13,7 @@ namespace BomberMan {
     protected static animations: ƒAid.SpriteSheetAnimations;
 
     protected gameManager: GameManager;
-    protected bombLevel: number = 1;
+    protected bombLevel: number = 3;
     protected bombSpeed: number = 1;
     protected canBomb: boolean = true;
     protected action: ACTION;
@@ -71,6 +71,10 @@ namespace BomberMan {
       console.log("generateSprites");
     }
 
+    public die(): void {
+      console.log("Wants to die");
+    }
+
     protected move(_dir: DIRECTION): void {
 
       if (this.distance > 0)
@@ -118,13 +122,8 @@ namespace BomberMan {
       if (mapData == 1 || mapData == 2)
         return;
 
-      let bomb: Bomb = new Bomb(this.map, this.gameManager, bombPos, 1);
+      let bomb: Bomb = new Bomb(this.map, this.gameManager, bombPos, this.bombLevel);
       this.gameManager.graph.appendChild(bomb);
-    }
-
-    public checkCollision(_pos: ƒ.Mutator): boolean {
-
-      return false;
     }
 
     public show(_action: ACTION, _direction: DIRECTION): void {

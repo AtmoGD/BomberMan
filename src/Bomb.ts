@@ -32,8 +32,16 @@ namespace BomberMan {
 
     private explode(): void {
       this.map.data[this.position.y][this.position.x] = 0;
-      let explosion: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.UP, 3);
-      this.gameManager.graph.appendChild(explosion);
+
+      let up: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.UP, this.level);
+      this.gameManager.graph.appendChild(up);
+      let down: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.DOWN, this.level);
+      this.gameManager.graph.appendChild(down);
+      let left: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.LEFT, this.level);
+      this.gameManager.graph.appendChild(left);
+      let right: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.RIGHT, this.level);
+      this.gameManager.graph.appendChild(right);
+
       this.gameManager.graph.removeChild(this);
     }
 

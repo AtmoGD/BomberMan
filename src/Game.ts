@@ -3,7 +3,13 @@ namespace BomberMan {
   interface Data {
     cameraDistance: number,
     fps: number,
+    mapSize: number,
     boxRespawnTime: number,
+    playerStartLives: number,
+    playerStartLevel: number,
+    playerMaxLevel: number,
+    enemyStartLevel: number,
+    enemyMaxLevel: number,
     enemyCount: number,
     enemySpeed: number,
     enemyRange: number,

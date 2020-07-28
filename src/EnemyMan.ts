@@ -3,7 +3,7 @@ namespace BomberMan {
     private wait: boolean = false;
 
     constructor(_map: Map, _gameManager: GameManager, _name?: string) {
-      super(_map, _gameManager, 5, _name ? _name : "BomberMan");
+      super(_map, _gameManager, 5, data.enemyStartLevel, data.enemyMaxLevel, _name ? _name : "BomberMan");
       this.speed = data.enemySpeed;
       this.bombSpeed = data.enemyBombSpeed;
     }
@@ -19,6 +19,7 @@ namespace BomberMan {
     }
 
     public die(): void {
+      this.gameManager.bomberman.takeScore(this.bombLevel * 100);
       this.dead = true;
       this.map.data[this.position.y][this.position.x] = 0;
       this.gameManager.graph.removeChild(this);

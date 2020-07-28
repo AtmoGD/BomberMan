@@ -5,7 +5,9 @@ namespace BomberMan {
     private score: number = 0;
 
     constructor(_map: Map, _gameManager: GameManager, _name?: string) {
-      super(_map, _gameManager, 4, _name ? _name : "BomberMan");
+      super(_map, _gameManager, 4, data.playerStartLevel, data.playerMaxLevel,_name ? _name : "BomberMan");
+      this.lives = data.playerStartLives;
+      this.speed *= 2;
       this.initKeyEvent();
     }
 
@@ -33,9 +35,23 @@ namespace BomberMan {
       }
     }
 
-    // protected move(): void {
-    //   this.show(ACTION.IDLE, this.dir);
-    // }
+    public takeScore(_amount: number): void {
+      this.score += _amount;
+      console.log(this.score);
+    }
+
+    public getScore(): number {
+      return this.score;
+    }
+
+    public die(): void {
+      this.lives--;
+
+      if (this.lives <= 0) {
+        //GameOver
+        console.log("GameOver")
+      }
+    }
 
     public static generateSprites(_coat: ƒ.CoatTextured): void {
       BomberMan.animations = {};

@@ -111,20 +111,25 @@ var BomberMan;
         DIRECTION[DIRECTION["DOWN"] = 3] = "DOWN";
     })(DIRECTION = BomberMan.DIRECTION || (BomberMan.DIRECTION = {}));
     class Man extends BomberMan.ƒAid.NodeSprite {
-        constructor(_map, _gameManager, _type, _name) {
+        constructor(_map, _gameManager, _type, _level, _maxLevel, _name) {
             super(_name ? _name : "Man");
-            this.bombLevel = 3;
-            this.bombSpeed = 1;
+            this.maxLevel = 1;
+            this.bombLevel = 1;
+            this.bombSpeed = 3;
+            this.speed = 2;
             this.canBomb = true;
+            this.dead = false;
             this.position = BomberMan.ƒ.Vector2.ZERO();
-            this.speed = 4;
             this.direc = DIRECTION.DOWN;
             this.distance = 0;
-            this.dead = false;
             this.map = _map;
             this.type = _type;
             this.gameManager = _gameManager;
+            this.maxLevel = _maxLevel;
             this.position = this.map.getRandomSpawnPoint(this.type);
+            for (let i = 0; i < _level - this.bombLevel; i++) {
+                this.upgrade();
+            }
             this.transform = new BomberMan.ƒ.ComponentTransform();
             this.addComponent(this.transform);
             this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
@@ -139,10 +144,11 @@ var BomberMan;
             this.movement();
         }
         upgrade() {
+            if (this.bombLevel >= this.maxLevel)
+                return;
             this.bombLevel++;
             this.bombSpeed *= 0.9;
             this.speed *= 1.1;
-            console.log("Upgrade");
         }
         generateSprites() {
             console.log("generateSprites");
@@ -235,9 +241,11 @@ var BomberMan;
 (function (BomberMan_1) {
     class BomberMan extends BomberMan_1.Man {
         constructor(_map, _gameManager, _name) {
-            super(_map, _gameManager, 4, _name ? _name : "BomberMan");
+            super(_map, _gameManager, 4, BomberMan_1.data.playerStartLevel, BomberMan_1.data.playerMaxLevel, _name ? _name : "BomberMan");
             this.lives = 3;
             this.score = 0;
+            this.lives = BomberMan_1.data.playerStartLives;
+            this.speed *= 2;
             this.initKeyEvent();
         }
         initKeyEvent() {
@@ -262,9 +270,20 @@ var BomberMan;
                     break;
             }
         }
-        // protected move(): void {
-        //   this.show(ACTION.IDLE, this.dir);
-        // }
+        takeScore(_amount) {
+            this.score += _amount;
+            console.log(this.score);
+        }
+        getScore() {
+            return this.score;
+        }
+        die() {
+            this.lives--;
+            if (this.lives <= 0) {
+                //GameOver
+                console.log("GameOver");
+            }
+        }
         static generateSprites(_coat) {
             BomberMan.animations = {};
             let sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.UP, _coat);
@@ -342,7 +361,7 @@ var BomberMan;
 (function (BomberMan) {
     class EnemyMan extends BomberMan.Man {
         constructor(_map, _gameManager, _name) {
-            super(_map, _gameManager, 5, _name ? _name : "BomberMan");
+            super(_map, _gameManager, 5, BomberMan.data.enemyStartLevel, BomberMan.data.enemyMaxLevel, _name ? _name : "BomberMan");
             this.wait = false;
             this.speed = BomberMan.data.enemySpeed;
             this.bombSpeed = BomberMan.data.enemyBombSpeed;
@@ -355,6 +374,7 @@ var BomberMan;
                 this.decideAction();
         }
         die() {
+            this.gameManager.bomberman.takeScore(this.bombLevel * 100);
             this.dead = true;
             this.map.data[this.position.y][this.position.x] = 0;
             this.gameManager.graph.removeChild(this);
@@ -585,7 +605,7 @@ var BomberMan;
         startGame() {
             BomberMan.Map.loadImages();
             this.loadSprites();
-            this.map = BomberMan.MapGenerator.generateRandomMap(21);
+            this.map = BomberMan.MapGenerator.generateRandomMap(BomberMan.data.mapSize);
             this.bomberman = new BomberMan.BomberMan(this.map, this, "Bomberman");
             for (let i = 0; i < BomberMan.data.enemyCount; i++) {
                 this.createEnemy();

@@ -140,6 +140,7 @@
 
   #gameOverlay {
     display: none;
+    top: 10px;
   }
 
   #gameOverOverlay {

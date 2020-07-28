@@ -13,25 +13,33 @@ namespace BomberMan {
     protected static animations: ƒAid.SpriteSheetAnimations;
 
     protected gameManager: GameManager;
-    protected bombLevel: number = 3;
-    protected bombSpeed: number = 1;
-    protected canBomb: boolean = true;
-    protected action: ACTION;
     protected map: Map;
-    protected type: number;
-    protected position: ƒ.Vector2 = ƒ.Vector2.ZERO();
-    protected speed: number = 4;
-    protected direc: DIRECTION = DIRECTION.DOWN;
-    protected distance: number = 0;
     protected transform: ƒ.ComponentTransform;
+    protected type: number;
+
+    protected maxLevel: number = 1;
+    protected bombLevel: number = 1;
+    protected bombSpeed: number = 3;
+    protected speed: number = 2;
+    protected canBomb: boolean = true;
     protected dead: boolean = false;
 
-    constructor(_map: Map, _gameManager: GameManager, _type: number, _name?: string) {
+    protected action: ACTION;
+    protected position: ƒ.Vector2 = ƒ.Vector2.ZERO();
+    protected direc: DIRECTION = DIRECTION.DOWN;
+    protected distance: number = 0;
+
+    constructor(_map: Map, _gameManager: GameManager, _type: number, _level: number, _maxLevel: number, _name?: string) {
       super(_name ? _name : "Man");
       this.map = _map;
       this.type = _type;
       this.gameManager = _gameManager;
+      this.maxLevel = _maxLevel;
       this.position = this.map.getRandomSpawnPoint(this.type);
+
+      for (let i: number = 0; i < _level - this.bombLevel; i++) {
+        this.upgrade();
+      }
 
       this.transform = new ƒ.ComponentTransform();
       this.addComponent(this.transform);
@@ -48,15 +56,17 @@ namespace BomberMan {
     protected update(): void {
       if (this.dead)
         return;
-        
+
       this.movement();
     }
 
     public upgrade(): void {
+      if (this.bombLevel >= this.maxLevel)
+        return;
+        
       this.bombLevel++;
       this.bombSpeed *= 0.9;
       this.speed *= 1.1;
-      console.log("Upgrade");
     }
 
     public generateSprites(): void {

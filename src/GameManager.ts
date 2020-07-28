@@ -13,7 +13,6 @@ namespace BomberMan {
     private upgrade: CustomEvent;
 
     constructor(_viewport: ƒ.Viewport, _graph: ƒ.Node, _camera: ƒ.ComponentCamera) {
-
       this.viewport = _viewport;
       this.graph = _graph;
       this.camera = _camera;
@@ -24,7 +23,7 @@ namespace BomberMan {
       Map.loadImages();
       this.loadSprites();
 
-      this.map = MapGenerator.generateRandomMap(21);
+      this.map = MapGenerator.generateRandomMap(data.mapSize);
 
       this.bomberman = new BomberMan(this.map, this, "Bomberman");
 

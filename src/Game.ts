@@ -42,11 +42,11 @@ namespace BomberMan {
     await loadData();
 
     camera = new ƒ.ComponentCamera();
-    camera.pivot.translateZ(data.cameraDistance);
+    camera.pivot.translate(new ƒ.Vector3(-0.5, 1, data.cameraDistance));
     camera.pivot.rotateY(180);
 
-    let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(1, 1, 0);
-    camera.pivot.lookAt(cameraLookAt);
+    //let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(1, 1, 0);
+    //camera.pivot.lookAt(cameraLookAt);
 
     graph = new ƒ.Node("Graph");
 
@@ -103,10 +103,14 @@ namespace BomberMan {
     gameOverOverlay.style.height = canvas.height.toString() + "px";
 
     gameManager.startGame();
+    gameManager.playMusic(audioButtonClick, false);
 
     viewport.draw();
   }
   export function endGame(): void {
+    gameManager.stopMusic(audioBackground);
+    gameManager.playMusic(audioDie, false);
+
     startOverlay.style.display = "none";
     gameOverOverlay.style.display = "flex";
     gameOverlay.style.display = "none";

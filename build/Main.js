@@ -4,14 +4,14 @@ var BomberMan;
     BomberMan.ƒ = FudgeCore;
     BomberMan.ƒAid = FudgeAid;
     window.addEventListener("load", handleLoad);
-    function handleLoad() {
+    async function handleLoad() {
         let path = window.location.pathname;
         let page = path.split("/").pop();
         if (!page) {
             BomberMan.initStartScreen();
             return;
         }
-        console.log(page);
+        await loadMusic();
         switch (page) {
             case "index.html":
             case "":
@@ -24,6 +24,14 @@ var BomberMan;
             default:
                 return;
         }
+    }
+    async function loadMusic() {
+        BomberMan.audioButtonClick = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Click.wav");
+        BomberMan.audioBackground = await BomberMan.ƒ.Audio.load("../assets/Sounds/Background.mp3");
+        BomberMan.audioExplosion = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Explosion.wav");
+        BomberMan.audioLoseLife = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Hurt.wav");
+        BomberMan.audioWalk = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Walk.wav");
+        BomberMan.audioDie = await BomberMan.ƒ.Audio.load("../Assets/Sounds/GameOver.wav");
     }
 })(BomberMan || (BomberMan = {}));
 ///<reference path="Main.ts"/>
@@ -58,6 +66,7 @@ var BomberMan;
             this.gameManager.graph.appendChild(left);
             let right = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.RIGHT, this.level);
             this.gameManager.graph.appendChild(right);
+            this.gameManager.playMusic(BomberMan.audioExplosion, false);
             this.gameManager.graph.removeChild(this);
         }
         generateAnimations() {
@@ -180,12 +189,14 @@ var BomberMan;
                 this.distance -= dist;
             }
             else {
+                this.gameManager.stopMusic(BomberMan.audioWalk);
                 this.show(ACTION.IDLE, this.direc);
             }
         }
         move(_dir) {
             if (this.distance > 0)
                 return;
+            this.gameManager.playMusic(BomberMan.audioWalk, true);
             let newPos = this.position.getMutator();
             switch (_dir) {
                 case DIRECTION.UP:
@@ -284,6 +295,7 @@ var BomberMan;
         }
         die() {
             this.lives--;
+            this.gameManager.playMusic(BomberMan_1.audioLoseLife, false);
             if (this.liveElement)
                 this.liveElement.innerText = this.lives.toString();
             if (this.endScoreElement)
@@ -561,10 +573,10 @@ var BomberMan;
         installEventListener();
         await loadData();
         camera = new BomberMan.ƒ.ComponentCamera();
-        camera.pivot.translateZ(BomberMan.data.cameraDistance);
+        camera.pivot.translate(new BomberMan.ƒ.Vector3(-0.5, 1, BomberMan.data.cameraDistance));
         camera.pivot.rotateY(180);
-        let cameraLookAt = new BomberMan.ƒ.Vector3(1, 1, 0);
-        camera.pivot.lookAt(cameraLookAt);
+        //let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(1, 1, 0);
+        //camera.pivot.lookAt(cameraLookAt);
         graph = new BomberMan.ƒ.Node("Graph");
         canvas = document.querySelector("canvas");
         viewport = new BomberMan.ƒ.Viewport();
@@ -609,9 +621,12 @@ var BomberMan;
         gameOverOverlay.style.width = canvas.width.toString() + "px";
         gameOverOverlay.style.height = canvas.height.toString() + "px";
         gameManager.startGame();
+        gameManager.playMusic(BomberMan.audioButtonClick, false);
         viewport.draw();
     }
     function endGame() {
+        gameManager.stopMusic(BomberMan.audioBackground);
+        gameManager.playMusic(BomberMan.audioDie, false);
         startOverlay.style.display = "none";
         gameOverOverlay.style.display = "flex";
         gameOverlay.style.display = "none";
@@ -626,7 +641,6 @@ var BomberMan;
             this.mans = [];
             this.bomberman = null;
             this.enemys = [];
-            this.gameOver = false;
             this.viewport = _viewport;
             this.graph = _graph;
             this.camera = _camera;
@@ -635,6 +649,7 @@ var BomberMan;
         startGame() {
             BomberMan.Map.loadImages();
             this.loadSprites();
+            this.playMusic(BomberMan.audioBackground, true);
             this.map = BomberMan.MapGenerator.generateRandomMap(BomberMan.data.mapSize);
             this.bomberman = new BomberMan.BomberMan(this.map, this, "Bomberman");
             for (let i = 0; i < BomberMan.data.enemyCount; i++) {
@@ -675,6 +690,22 @@ var BomberMan;
             BomberMan.EnemyMan.generateSprites(coat);
             BomberMan.Bomb.takeCoat(coat);
             BomberMan.Explosion.generateSprites(coat);
+        }
+        playMusic(_music, _loop) {
+            let cmpAudio = new BomberMan.ƒ.ComponentAudio(_music, _loop, true);
+            let volume = +BomberMan.getCookie("volume");
+            if (volume)
+                cmpAudio.volume = _loop ? volume : volume / 2;
+            this.graph.addComponent(cmpAudio);
+            BomberMan.ƒ.AudioManager.default.listenTo(this.graph);
+        }
+        stopMusic(_music) {
+            let coms = this.graph.getComponents(BomberMan.ƒ.ComponentAudio);
+            coms.forEach(element => {
+                if (element.audio == _music) {
+                    this.graph.removeComponent(element);
+                }
+            });
         }
     }
     BomberMan.GameManager = GameManager;
@@ -794,7 +825,7 @@ var BomberMan;
                 mode = Math.floor(Math.random() * 3);
             switch (mode) {
                 case 0:
-                    return new BomberMan.Map(this.randomGrid(_size));
+                //return new Map(this.randomGrid(_size));
                 case 1:
                 //return new Map(this.randomCross(_size));
                 default:
@@ -898,7 +929,7 @@ var BomberMan;
         volumeInput = document.querySelector("#volumeInput");
         if (volumeInput) {
             volumeInput.addEventListener("change", updateVolume);
-            let volume = BomberMan.getCookie("Volume");
+            let volume = BomberMan.getCookie("volume");
             if (volume != undefined) {
                 volumeInput.value = volume;
             }
@@ -906,14 +937,15 @@ var BomberMan;
     }
     BomberMan.initStartScreen = initStartScreen;
     function startGame() {
-        window.location.href = "./html/Game.html";
+        let audio = new Audio('../assets/Sounds/Click.wav');
+        audio.play();
+        setTimeout(() => { window.location.href = "./html/Game.html"; }, 1000);
     }
     function updateVolume() {
         let volume = volumeInput?.value;
         if (!volume)
             return;
-        BomberMan.setCookie("Volume", volume);
-        console.log(document.cookie);
+        BomberMan.setCookie("volume", volume);
     }
 })(BomberMan || (BomberMan = {}));
 var BomberMan;

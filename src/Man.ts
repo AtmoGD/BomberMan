@@ -101,13 +101,17 @@ namespace BomberMan {
         }
         this.distance -= dist;
       } else {
+        this.gameManager.stopMusic(audioWalk);
         this.show(ACTION.IDLE, this.direc);
       }
     }
+
     protected move(_dir: DIRECTION): void {
 
       if (this.distance > 0)
         return;
+
+      this.gameManager.playMusic(audioWalk, true);
 
       let newPos: ƒ.Mutator = this.position.getMutator();
       switch (_dir) {

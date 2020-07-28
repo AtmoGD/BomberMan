@@ -56,13 +56,14 @@ namespace BomberMan {
 
     public die(): void {
       this.lives--;
-
+      this.gameManager.playMusic(audioLoseLife, false);
+      
       if (this.liveElement)
         this.liveElement.innerText = this.lives.toString();
       
       if (this.endScoreElement)
         this.endScoreElement.innerText = this.score.toString();
-        
+
       if (this.lives <= 0) {
         setTimeout(()=> {
           let gameOver: CustomEvent = new CustomEvent("gameOver", {bubbles: true});

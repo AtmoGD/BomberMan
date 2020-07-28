@@ -11,7 +11,7 @@ namespace BomberMan {
 
       switch (mode) {
         case 0:
-          return new Map(this.randomGrid(_size));
+          //return new Map(this.randomGrid(_size));
         case 1:
           //return new Map(this.randomCross(_size));
         default:

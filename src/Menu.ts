@@ -11,7 +11,7 @@ namespace BomberMan {
     if (volumeInput) {
       volumeInput.addEventListener("change", updateVolume);
 
-      let volume: string | undefined= getCookie("Volume");
+      let volume: string | undefined = getCookie("volume");
       if (volume != undefined) {
         volumeInput.value = volume;
       }
@@ -19,7 +19,9 @@ namespace BomberMan {
   }
 
   function startGame(): void {
-    window.location.href = "./html/Game.html"; 
+    let audio = new Audio('../assets/Sounds/Click.wav');
+    audio.play();
+    setTimeout(() => {window.location.href = "./html/Game.html";}, 1000);
   }
 
   function updateVolume(): void {
@@ -27,7 +29,6 @@ namespace BomberMan {
     if (!volume)
       return;
 
-    setCookie("Volume", volume);
-    console.log(document.cookie);
+    setCookie("volume", volume);
   }
 }

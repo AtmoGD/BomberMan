@@ -41,7 +41,8 @@ namespace BomberMan {
       this.gameManager.graph.appendChild(left);
       let right: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.RIGHT, this.level);
       this.gameManager.graph.appendChild(right);
-
+      
+      this.gameManager.playMusic(audioExplosion, false);
       this.gameManager.graph.removeChild(this);
     }
 

@@ -9,7 +9,6 @@ namespace BomberMan {
     public bomberman: BomberMan = null;
     public enemys: EnemyMan[] = [];
 
-    private gameOver: boolean = false;
     private upgrade: CustomEvent;
 
     constructor(_viewport: ƒ.Viewport, _graph: ƒ.Node, _camera: ƒ.ComponentCamera) {
@@ -22,6 +21,8 @@ namespace BomberMan {
     public startGame(): void {
       Map.loadImages();
       this.loadSprites();
+
+      this.playMusic(audioBackground, true);
 
       this.map = MapGenerator.generateRandomMap(data.mapSize);
 
@@ -72,6 +73,26 @@ namespace BomberMan {
       EnemyMan.generateSprites(coat);
       Bomb.takeCoat(coat);
       Explosion.generateSprites(coat);
+    }
+
+    public playMusic(_music: ƒ.Audio, _loop: boolean) {
+      let cmpAudio: ƒ.ComponentAudio = new ƒ.ComponentAudio(_music, _loop, true);
+      let volume: number = +getCookie("volume");
+
+      if (volume)
+        cmpAudio.volume = _loop ? volume : volume / 2;
+
+      this.graph.addComponent(cmpAudio);
+      ƒ.AudioManager.default.listenTo(this.graph);
+    }
+
+    public stopMusic(_music: ƒ.Audio): void {
+      let coms:  ƒ.ComponentAudio[] = this.graph.getComponents(ƒ.ComponentAudio);
+      coms.forEach(element => {
+        if (element.audio == _music) {
+          this.graph.removeComponent(element);
+        }
+      });
     }
   }
 }

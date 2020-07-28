@@ -16,7 +16,7 @@ namespace BomberMan {
       this.viewport = _viewport;
       this.graph = _graph;
       this.camera = _camera;
-      this.upgrade = new CustomEvent("upgrade", {bubbles: true});
+      this.upgrade = new CustomEvent("upgrade", { bubbles: true });
     }
 
     public startGame(): void {
@@ -33,7 +33,12 @@ namespace BomberMan {
 
       this.graph.appendChild(this.map);
       this.graph.appendChild(this.bomberman);
-      
+
+      this.graph.addEventListener("gameOver", () => {
+        ƒ.Loop.stop();
+        endGame();
+      })
+
       setInterval(() => {
         this.graph.broadcastEvent(this.upgrade);
       }, data.upgradeSpeed);

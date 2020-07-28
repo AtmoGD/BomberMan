@@ -22,12 +22,14 @@ namespace BomberMan {
   let graph: ƒ.Node;
 
   let gameManager: GameManager;
+  let canvas: HTMLCanvasElement;
 
   let startOverlay: HTMLDivElement;
   let gameOverlay: HTMLDivElement;
   let gameOverOverlay: HTMLDivElement;
 
   let startButton: HTMLButtonElement;
+  let playAgainButton: HTMLButtonElement;
 
   export let data: Data;
 
@@ -48,15 +50,12 @@ namespace BomberMan {
 
     graph = new ƒ.Node("Graph");
 
-    const canvas: HTMLCanvasElement = document.querySelector("canvas");
+    canvas = document.querySelector("canvas");
     viewport = new ƒ.Viewport();
     viewport.initialize("Viewport", graph, camera, canvas);
 
     gameManager = new GameManager(viewport, graph, camera);
     viewport.draw();
-
-    let gizmo = new ƒAid.NodeCoordinateSystem("ControlSystem");
-    graph.addChild(gizmo);
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, data.fps);
@@ -76,19 +75,40 @@ namespace BomberMan {
     gameOverlay = document.querySelector("#gameOverlay");
     gameOverOverlay = document.querySelector("#gameOverOverlay");
     startButton = document.querySelector("#startButton");
+    playAgainButton = document.querySelector("#playAgain");
   }
 
   function installEventListener() {
     startButton.addEventListener("click", startGame);
+    playAgainButton.addEventListener("click", () => {window.location.reload()});
+    window.addEventListener("resize", updateGUI);
+  }
+
+  function updateGUI(): void {
+    gameOverlay.style.width = canvas.width.toString() + "px";
+    gameOverlay.style.height = canvas.height.toString() + "px";
+    gameOverOverlay.style.width = canvas.width.toString() + "px";
+    gameOverOverlay.style.height = canvas.height.toString() + "px";
   }
 
   function startGame(): void {
     startOverlay.style.display = "none";
-    gameOverlay.style.display = "flex";
     gameOverOverlay.style.display = "none";
+    gameOverlay.style.display = "flex";
+
+    gameOverlay.style.width = canvas.width.toString() + "px";
+    gameOverlay.style.height = canvas.height.toString() + "px";
+
+    gameOverOverlay.style.width = canvas.width.toString() + "px";
+    gameOverOverlay.style.height = canvas.height.toString() + "px";
 
     gameManager.startGame();
 
     viewport.draw();
+  }
+  export function endGame(): void {
+    startOverlay.style.display = "none";
+    gameOverOverlay.style.display = "flex";
+    gameOverlay.style.display = "none";
   }
 }

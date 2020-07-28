@@ -4,11 +4,19 @@ namespace BomberMan {
     private lives: number = 3;
     private score: number = 0;
 
+    private liveElement: HTMLSpanElement;
+    private scoreElement: HTMLSpanElement;
+    private endScoreElement: HTMLSpanElement;
+
     constructor(_map: Map, _gameManager: GameManager, _name?: string) {
       super(_map, _gameManager, 4, data.playerStartLevel, data.playerMaxLevel,_name ? _name : "BomberMan");
       this.lives = data.playerStartLives;
       this.speed *= 2;
       this.initKeyEvent();
+      this.liveElement = document.querySelector("#lives");
+      this.liveElement.innerText = this.lives.toString();
+      this.scoreElement = document.querySelector("#score");
+      this.endScoreElement = document.querySelector("#endScore");
     }
 
     private initKeyEvent(): void {
@@ -37,7 +45,9 @@ namespace BomberMan {
 
     public takeScore(_amount: number): void {
       this.score += _amount;
-      console.log(this.score);
+
+      if (this.scoreElement)
+        this.scoreElement.innerText = this.score.toString();
     }
 
     public getScore(): number {
@@ -47,9 +57,17 @@ namespace BomberMan {
     public die(): void {
       this.lives--;
 
+      if (this.liveElement)
+        this.liveElement.innerText = this.lives.toString();
+      
+      if (this.endScoreElement)
+        this.endScoreElement.innerText = this.score.toString();
+        
       if (this.lives <= 0) {
-        //GameOver
-        console.log("GameOver")
+        setTimeout(()=> {
+          let gameOver: CustomEvent = new CustomEvent("gameOver", {bubbles: true});
+          this.dispatchEvent(gameOver);
+        }, 100);
       }
     }
 

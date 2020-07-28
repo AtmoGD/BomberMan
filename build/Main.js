@@ -247,6 +247,10 @@ var BomberMan;
             this.lives = BomberMan_1.data.playerStartLives;
             this.speed *= 2;
             this.initKeyEvent();
+            this.liveElement = document.querySelector("#lives");
+            this.liveElement.innerText = this.lives.toString();
+            this.scoreElement = document.querySelector("#score");
+            this.endScoreElement = document.querySelector("#endScore");
         }
         initKeyEvent() {
             window.addEventListener("keydown", this.handleKeyPress.bind(this));
@@ -272,16 +276,23 @@ var BomberMan;
         }
         takeScore(_amount) {
             this.score += _amount;
-            console.log(this.score);
+            if (this.scoreElement)
+                this.scoreElement.innerText = this.score.toString();
         }
         getScore() {
             return this.score;
         }
         die() {
             this.lives--;
+            if (this.liveElement)
+                this.liveElement.innerText = this.lives.toString();
+            if (this.endScoreElement)
+                this.endScoreElement.innerText = this.score.toString();
             if (this.lives <= 0) {
-                //GameOver
-                console.log("GameOver");
+                setTimeout(() => {
+                    let gameOver = new CustomEvent("gameOver", { bubbles: true });
+                    this.dispatchEvent(gameOver);
+                }, 100);
             }
         }
         static generateSprites(_coat) {
@@ -538,10 +549,12 @@ var BomberMan;
     let viewport;
     let graph;
     let gameManager;
+    let canvas;
     let startOverlay;
     let gameOverlay;
     let gameOverOverlay;
     let startButton;
+    let playAgainButton;
     // ƒ.RenderManager.initialize(true, true);
     async function initGame() {
         getReferences();
@@ -553,13 +566,11 @@ var BomberMan;
         let cameraLookAt = new BomberMan.ƒ.Vector3(1, 1, 0);
         camera.pivot.lookAt(cameraLookAt);
         graph = new BomberMan.ƒ.Node("Graph");
-        const canvas = document.querySelector("canvas");
+        canvas = document.querySelector("canvas");
         viewport = new BomberMan.ƒ.Viewport();
         viewport.initialize("Viewport", graph, camera, canvas);
         gameManager = new BomberMan.GameManager(viewport, graph, camera);
         viewport.draw();
-        let gizmo = new BomberMan.ƒAid.NodeCoordinateSystem("ControlSystem");
-        graph.addChild(gizmo);
         BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         BomberMan.ƒ.Loop.start(BomberMan.ƒ.LOOP_MODE.TIME_REAL, BomberMan.data.fps);
     }
@@ -576,17 +587,36 @@ var BomberMan;
         gameOverlay = document.querySelector("#gameOverlay");
         gameOverOverlay = document.querySelector("#gameOverOverlay");
         startButton = document.querySelector("#startButton");
+        playAgainButton = document.querySelector("#playAgain");
     }
     function installEventListener() {
         startButton.addEventListener("click", startGame);
+        playAgainButton.addEventListener("click", () => { window.location.reload(); });
+        window.addEventListener("resize", updateGUI);
+    }
+    function updateGUI() {
+        gameOverlay.style.width = canvas.width.toString() + "px";
+        gameOverlay.style.height = canvas.height.toString() + "px";
+        gameOverOverlay.style.width = canvas.width.toString() + "px";
+        gameOverOverlay.style.height = canvas.height.toString() + "px";
     }
     function startGame() {
         startOverlay.style.display = "none";
-        gameOverlay.style.display = "flex";
         gameOverOverlay.style.display = "none";
+        gameOverlay.style.display = "flex";
+        gameOverlay.style.width = canvas.width.toString() + "px";
+        gameOverlay.style.height = canvas.height.toString() + "px";
+        gameOverOverlay.style.width = canvas.width.toString() + "px";
+        gameOverOverlay.style.height = canvas.height.toString() + "px";
         gameManager.startGame();
         viewport.draw();
     }
+    function endGame() {
+        startOverlay.style.display = "none";
+        gameOverOverlay.style.display = "flex";
+        gameOverlay.style.display = "none";
+    }
+    BomberMan.endGame = endGame;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
@@ -612,6 +642,10 @@ var BomberMan;
             }
             this.graph.appendChild(this.map);
             this.graph.appendChild(this.bomberman);
+            this.graph.addEventListener("gameOver", () => {
+                BomberMan.ƒ.Loop.stop();
+                BomberMan.endGame();
+            });
             setInterval(() => {
                 this.graph.broadcastEvent(this.upgrade);
             }, BomberMan.data.upgradeSpeed);
@@ -762,7 +796,7 @@ var BomberMan;
                 case 0:
                     return new BomberMan.Map(this.randomGrid(_size));
                 case 1:
-                    return new BomberMan.Map(this.randomCross(_size));
+                //return new Map(this.randomCross(_size));
                 default:
                     return new BomberMan.Map(this.standardMap(_size));
             }

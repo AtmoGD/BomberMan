@@ -16,6 +16,7 @@ namespace BomberMan {
       this.viewport = _viewport;
       this.graph = _graph;
       this.camera = _camera;
+      
     }
 
     public startGame(): void {
@@ -27,9 +28,7 @@ namespace BomberMan {
       this.bomberman = new BomberMan(this.map, this, "Bomberman");
 
       for (let i: number = 0; i < data.enemyCount; i++) {
-        let newEnemy: EnemyMan = new EnemyMan(this.map, this, "EnemyMan");
-        this.enemys.push(newEnemy);
-        this.graph.appendChild(newEnemy);
+        this.createEnemy();
       }
 
       this.graph.appendChild(this.map);
@@ -38,6 +37,12 @@ namespace BomberMan {
 
     public getMap(): Map {
       return this.map;
+    }
+
+    public createEnemy(): void {
+      let newEnemy: EnemyMan = new EnemyMan(this.map, this, "EnemyMan");
+      this.enemys.push(newEnemy);
+      this.graph.appendChild(newEnemy);
     }
 
     public getEnemy(_position: ƒ.Vector2): EnemyMan | null {

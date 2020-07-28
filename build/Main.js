@@ -351,6 +351,7 @@ var BomberMan;
             this.dead = true;
             this.map.data[this.position.y][this.position.x] = 0;
             this.gameManager.graph.removeChild(this);
+            setTimeout(() => { this.gameManager.createEnemy(); }, 2000);
         }
         decideAction() {
             if (this.wait)
@@ -579,15 +580,18 @@ var BomberMan;
             this.map = BomberMan.MapGenerator.generateRandomMap(21);
             this.bomberman = new BomberMan.BomberMan(this.map, this, "Bomberman");
             for (let i = 0; i < BomberMan.data.enemyCount; i++) {
-                let newEnemy = new BomberMan.EnemyMan(this.map, this, "EnemyMan");
-                this.enemys.push(newEnemy);
-                this.graph.appendChild(newEnemy);
+                this.createEnemy();
             }
             this.graph.appendChild(this.map);
             this.graph.appendChild(this.bomberman);
         }
         getMap() {
             return this.map;
+        }
+        createEnemy() {
+            let newEnemy = new BomberMan.EnemyMan(this.map, this, "EnemyMan");
+            this.enemys.push(newEnemy);
+            this.graph.appendChild(newEnemy);
         }
         getEnemy(_position) {
             for (let enemy of this.enemys) {

@@ -22,6 +22,7 @@ namespace BomberMan {
       this.dead = true;
       this.map.data[this.position.y][this.position.x] = 0;
       this.gameManager.graph.removeChild(this);
+      setTimeout(() => {this.gameManager.createEnemy()}, 2000);
     }
 
     private decideAction(): void {

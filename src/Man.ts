@@ -36,7 +36,7 @@ namespace BomberMan {
       this.transform = new ƒ.ComponentTransform();
       this.addComponent(this.transform);
       this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
-      this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 1));
+      this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 0.1));
 
       this.show(ACTION.IDLE, DIRECTION.DOWN);
       ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.update.bind(this));

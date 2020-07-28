@@ -43,7 +43,7 @@ var BomberMan;
             this.addComponent(new BomberMan.ƒ.ComponentTransform());
             let pos = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
             this.mtxLocal.translation = pos;
-            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 0.1));
             this.map.data[this.position.y][this.position.x] = this.type;
             this.setAnimation(this.animations["Explode"]);
             setTimeout(this.explode.bind(this), this.lifetime);
@@ -128,7 +128,7 @@ var BomberMan;
             this.transform = new BomberMan.ƒ.ComponentTransform();
             this.addComponent(this.transform);
             this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
-            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 0.1));
             this.show(ACTION.IDLE, DIRECTION.DOWN);
             BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
         }
@@ -349,6 +349,7 @@ var BomberMan;
         }
         die() {
             this.dead = true;
+            this.map.data[this.position.y][this.position.x] = 0;
             this.gameManager.graph.removeChild(this);
         }
         decideAction() {
@@ -438,7 +439,7 @@ var BomberMan;
             this.addComponent(new BomberMan.ƒ.ComponentTransform());
             let pos = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
             this.mtxLocal.translation = pos;
-            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 0.1));
             this.setAnimation(Explosion.animations["Explosion"]);
             setTimeout(this.breed.bind(this), 100);
             setTimeout(this.die.bind(this), 1000);
@@ -716,14 +717,54 @@ var BomberMan;
 var BomberMan;
 (function (BomberMan) {
     class MapGenerator {
-        static generateRandomMap(_size) {
+        static generateRandomMap(_size, _mode) {
             if (!_size)
                 _size = Math.floor((Math.random() * 5) + 5);
-            let mode = Math.floor(Math.random() * 1);
+            let mode = _mode;
+            if (!mode)
+                mode = Math.floor(Math.random() * 3);
             switch (mode) {
-                default:
+                case 0:
                     return new BomberMan.Map(this.randomGrid(_size));
+                case 1:
+                    return new BomberMan.Map(this.randomCross(_size));
+                default:
+                    return new BomberMan.Map(this.standardMap(_size));
             }
+        }
+        static standardMap(_size) {
+            let _data = [];
+            for (let i = 0; i < _size; i++)
+                _data[i] = [];
+            for (let y = 0; y < _size; y++) {
+                for (let x = 0; x < _size; x++) {
+                    if (x == 0 || y == 0 || x == _size - 1 || y == _size - 1) {
+                        _data[y][x] = 1;
+                    }
+                    else {
+                        if (x % 2 == 0 && y % 2 == 0) {
+                            _data[y][x] = 1;
+                        }
+                        else {
+                            _data[y][x] = 0;
+                        }
+                    }
+                }
+            }
+            _data = MapGenerator.addBoxes(_data, _size);
+            return _data;
+        }
+        static addBoxes(_data, _count) {
+            let x = Math.floor(Math.random() * _data[0].length);
+            let y = Math.floor(Math.random() * _data.length);
+            if (_data[y][x] == 0) {
+                _data[y][x] = 2;
+                _count--;
+            }
+            if (_count <= 0)
+                return _data;
+            else
+                return MapGenerator.addBoxes(_data, _count);
         }
         static randomGrid(_size) {
             let _data = [];
@@ -736,7 +777,7 @@ var BomberMan;
                         _data[y][x] = 1;
                     }
                     else {
-                        if ((x % rndSize == 0) || y % rndSize == 0) {
+                        if (x % rndSize == 0 || y % rndSize == 0) {
                             _data[y][x] = 2;
                         }
                         else {

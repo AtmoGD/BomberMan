@@ -20,6 +20,7 @@ namespace BomberMan {
 
     public die(): void {
       this.dead = true;
+      this.map.data[this.position.y][this.position.x] = 0;
       this.gameManager.graph.removeChild(this);
     }
 

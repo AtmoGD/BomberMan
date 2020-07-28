@@ -10,13 +10,14 @@ namespace BomberMan {
     public enemys: EnemyMan[] = [];
 
     private gameOver: boolean = false;
+    private upgrade: CustomEvent;
 
     constructor(_viewport: ƒ.Viewport, _graph: ƒ.Node, _camera: ƒ.ComponentCamera) {
 
       this.viewport = _viewport;
       this.graph = _graph;
       this.camera = _camera;
-      
+      this.upgrade = new CustomEvent("upgrade", {bubbles: true});
     }
 
     public startGame(): void {
@@ -33,6 +34,10 @@ namespace BomberMan {
 
       this.graph.appendChild(this.map);
       this.graph.appendChild(this.bomberman);
+      
+      setInterval(() => {
+        this.graph.broadcastEvent(this.upgrade);
+      }, data.upgradeSpeed);
     }
 
     public getMap(): Map {

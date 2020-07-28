@@ -129,6 +129,7 @@ var BomberMan;
             this.addComponent(this.transform);
             this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
             this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 0.1));
+            this.addEventListener("upgrade", this.upgrade.bind(this), true);
             this.show(ACTION.IDLE, DIRECTION.DOWN);
             BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
         }
@@ -136,6 +137,12 @@ var BomberMan;
             if (this.dead)
                 return;
             this.movement();
+        }
+        upgrade() {
+            this.bombLevel++;
+            this.bombSpeed *= 0.9;
+            this.speed *= 1.1;
+            console.log("Upgrade");
         }
         generateSprites() {
             console.log("generateSprites");
@@ -573,6 +580,7 @@ var BomberMan;
             this.viewport = _viewport;
             this.graph = _graph;
             this.camera = _camera;
+            this.upgrade = new CustomEvent("upgrade", { bubbles: true });
         }
         startGame() {
             BomberMan.Map.loadImages();
@@ -584,6 +592,9 @@ var BomberMan;
             }
             this.graph.appendChild(this.map);
             this.graph.appendChild(this.bomberman);
+            setInterval(() => {
+                this.graph.broadcastEvent(this.upgrade);
+            }, BomberMan.data.upgradeSpeed);
         }
         getMap() {
             return this.map;

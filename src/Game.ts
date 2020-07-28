@@ -7,7 +7,8 @@ namespace BomberMan {
     enemyCount: number,
     enemySpeed: number,
     enemyRange: number,
-    enemyBombSpeed: number
+    enemyBombSpeed: number,
+    upgradeSpeed: number
   }
 
   let camera: ƒ.ComponentCamera;

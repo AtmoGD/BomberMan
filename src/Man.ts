@@ -38,6 +38,8 @@ namespace BomberMan {
       this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
       this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 0.1));
 
+      this.addEventListener("upgrade", this.upgrade.bind(this), true);
+
       this.show(ACTION.IDLE, DIRECTION.DOWN);
       ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.update.bind(this));
     }
@@ -48,6 +50,13 @@ namespace BomberMan {
         return;
         
       this.movement();
+    }
+
+    public upgrade(): void {
+      this.bombLevel++;
+      this.bombSpeed *= 0.9;
+      this.speed *= 1.1;
+      console.log("Upgrade");
     }
 
     public generateSprites(): void {

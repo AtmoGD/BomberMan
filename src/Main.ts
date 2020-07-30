@@ -36,11 +36,11 @@ namespace BomberMan {
   }
 
   async function loadMusic(): Promise<void> {
-    audioButtonClick = await ƒ.Audio.load("../Assets/Sounds/Click.wav");
+    audioButtonClick = await ƒ.Audio.load("../assets/Sounds/Click.wav");
     audioBackground = await ƒ.Audio.load("../assets/Sounds/Background.mp3");
-    audioExplosion = await ƒ.Audio.load("../Assets/Sounds/Explosion.wav");
-    audioLoseLife = await ƒ.Audio.load("../Assets/Sounds/Hurt.wav");
-    audioWalk = await ƒ.Audio.load("../Assets/Sounds/Walk.wav");
-    audioDie = await ƒ.Audio.load("../Assets/Sounds/GameOver.wav");
+    audioExplosion = await ƒ.Audio.load("../assets/Sounds/Explosion.wav");
+    audioLoseLife = await ƒ.Audio.load("../assets/Sounds/Hurt.wav");
+    audioWalk = await ƒ.Audio.load("../assets/Sounds/Walk.wav");
+    audioDie = await ƒ.Audio.load("../assets/Sounds/GameOver.wav");
   }
 }

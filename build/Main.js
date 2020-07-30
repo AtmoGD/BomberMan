@@ -26,12 +26,12 @@ var BomberMan;
         }
     }
     async function loadMusic() {
-        BomberMan.audioButtonClick = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Click.wav");
+        BomberMan.audioButtonClick = await BomberMan.ƒ.Audio.load("../assets/Sounds/Click.wav");
         BomberMan.audioBackground = await BomberMan.ƒ.Audio.load("../assets/Sounds/Background.mp3");
-        BomberMan.audioExplosion = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Explosion.wav");
-        BomberMan.audioLoseLife = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Hurt.wav");
-        BomberMan.audioWalk = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Walk.wav");
-        BomberMan.audioDie = await BomberMan.ƒ.Audio.load("../Assets/Sounds/GameOver.wav");
+        BomberMan.audioExplosion = await BomberMan.ƒ.Audio.load("../assets/Sounds/Explosion.wav");
+        BomberMan.audioLoseLife = await BomberMan.ƒ.Audio.load("../assets/Sounds/Hurt.wav");
+        BomberMan.audioWalk = await BomberMan.ƒ.Audio.load("../assets/Sounds/Walk.wav");
+        BomberMan.audioDie = await BomberMan.ƒ.Audio.load("../assets/Sounds/GameOver.wav");
     }
 })(BomberMan || (BomberMan = {}));
 ///<reference path="Main.ts"/>

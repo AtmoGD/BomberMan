@@ -22,7 +22,7 @@ namespace BomberMan {
       this.addComponent(new ƒ.ComponentTransform());
       let pos: ƒ.Vector3 = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
       this.mtxLocal.translation = pos;
-      this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 1));
+      this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 0.1));
 
       this.map.data[this.position.y][this.position.x] = this.type;
 
@@ -41,7 +41,8 @@ namespace BomberMan {
       this.gameManager.graph.appendChild(left);
       let right: Explosion = new Explosion(this.gameManager, this.map, this.position, DIRECTION.RIGHT, this.level);
       this.gameManager.graph.appendChild(right);
-
+      
+      this.gameManager.playMusic(audioExplosion, false);
       this.gameManager.graph.removeChild(this);
     }
 

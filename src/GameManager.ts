@@ -6,55 +6,62 @@ namespace BomberMan {
 
     public map: Map = null;
     public mans: Man[] = [];
-    public destroyables: Destroyable[] = [];
     public bomberman: BomberMan = null;
+    public enemys: EnemyMan[] = [];
 
-    private gameOver: boolean = false;
+    private upgrade: CustomEvent;
 
     constructor(_viewport: ƒ.Viewport, _graph: ƒ.Node, _camera: ƒ.ComponentCamera) {
-
       this.viewport = _viewport;
       this.graph = _graph;
       this.camera = _camera;
+      this.upgrade = new CustomEvent("upgrade", { bubbles: true });
     }
 
     public startGame(): void {
       Map.loadImages();
-      this.map = MapGenerator.generateRandomMap(21);
-      this.graph.appendChild(this.map);
-
       this.loadSprites();
+
+      this.playMusic(audioBackground, true);
+
+      this.map = MapGenerator.generateRandomMap(data.mapSize);
+
       this.bomberman = new BomberMan(this.map, this, "Bomberman");
+
+      for (let i: number = 0; i < data.enemyCount; i++) {
+        this.createEnemy();
+      }
+
+      this.graph.appendChild(this.map);
       this.graph.appendChild(this.bomberman);
 
-    }
-    public checkCollisionAll(_target: ƒ.Vector3): Man | Destroyable | null {
+      this.graph.addEventListener("gameOver", () => {
+        ƒ.Loop.stop();
+        endGame();
+      })
 
-      let restDest: Destroyable | null = this.checkCollisionDestroyables(_target);
-      let restMan: Man | null = this.checkCollisionMans(_target);
-      return restDest ? restDest : restMan;
-    }
-
-    public checkCollisionDestroyables(_pos: ƒ.Vector3): Destroyable | null {
-      for (let dest of this.destroyables) {
-        if (dest.mtxLocal.translation.isInsideSphere(_pos, 1)) {
-          return dest;
-        }
-      }
-      return null;
-    }
-
-    public checkCollisionMans(_pos: ƒ.Vector3): Man | null {
-      for (let man of this.mans) {
-        if (man.mtxLocal.translation.isInsideSphere(_pos, 1)) {
-          return man;
-        }
-      }
-      return null;
+      setInterval(() => {
+        this.graph.broadcastEvent(this.upgrade);
+      }, data.upgradeSpeed);
     }
 
     public getMap(): Map {
       return this.map;
+    }
+
+    public createEnemy(): void {
+      let newEnemy: EnemyMan = new EnemyMan(this.map, this, "EnemyMan");
+      this.enemys.push(newEnemy);
+      this.graph.appendChild(newEnemy);
+    }
+
+    public getEnemy(_position: ƒ.Vector2): EnemyMan | null {
+      for (let enemy of this.enemys) {
+        let enemyPos: ƒ.Vector2 = enemy.getPosition();
+        if (_position.x == enemyPos.x && _position.y == enemyPos.y)
+          return enemy;
+      }
+      return null;
     }
 
     private loadSprites(): void {
@@ -63,8 +70,29 @@ namespace BomberMan {
       coat.texture = new ƒ.TextureImage();
       coat.texture.image = img;
       BomberMan.generateSprites(coat);
+      EnemyMan.generateSprites(coat);
       Bomb.takeCoat(coat);
       Explosion.generateSprites(coat);
+    }
+
+    public playMusic(_music: ƒ.Audio, _loop: boolean) {
+      let cmpAudio: ƒ.ComponentAudio = new ƒ.ComponentAudio(_music, _loop, true);
+      let volume: number = +getCookie("volume");
+
+      if (volume)
+        cmpAudio.volume = _loop ? volume : volume / 2;
+
+      this.graph.addComponent(cmpAudio);
+      ƒ.AudioManager.default.listenTo(this.graph);
+    }
+
+    public stopMusic(_music: ƒ.Audio): void {
+      let coms:  ƒ.ComponentAudio[] = this.graph.getComponents(ƒ.ComponentAudio);
+      coms.forEach(element => {
+        if (element.audio == _music) {
+          this.graph.removeComponent(element);
+        }
+      });
     }
   }
 }

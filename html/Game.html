@@ -23,8 +23,16 @@
           Start Game
         </button>
       </div>
-      <div id="gameOverlay" class="overlay"></div>
-      <div id="gameOverOverlay" class="overlay"></div>
+      <div id="gameOverlay" class="overlay">
+        <span class="left">Lives: <span id="lives">3</span></span>
+        <span class="left">Level: <span id="lives">3</span></span>
+        <span class="right">Score: <span id="score">0</span></span>
+      </div>
+      <div id="gameOverOverlay" class="overlay">
+        <div class="endScreen">Game Over!</div>
+        <div class="endScreen">Your score is: <span id="endScore">0</span></div>
+        <button class="endScreen" id="playAgain">Play again!</button>
+      </div>
     </div>
   </div>
   <img class="src" src="../assets/img/ground_grass.png" alt="gras" id="gras" crossorigin="anonymous">

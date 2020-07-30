@@ -20,7 +20,7 @@ namespace BomberMan {
       this.addComponent(new ƒ.ComponentTransform());
       let pos: ƒ.Vector3 = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
       this.mtxLocal.translation = pos;
-      this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 1));
+      this.mtxLocal.translate(new ƒ.Vector3(-0.5, -0.5, 0.1));
 
       this.setAnimation(<ƒAid.SpriteSheetAnimation>Explosion.animations["Explosion"]);
 
@@ -33,11 +33,13 @@ namespace BomberMan {
           this.map.destroyBox(this.position);
           this.end = true;
           break;
-        case 3:
+        case 4:
           this.gameManager.bomberman.die();
           this.end = true;
           break;
-        case 4:
+        case 5:
+          let enemy: EnemyMan = this.gameManager.getEnemy(this.position);
+          enemy.die();
           break;
       }
     }

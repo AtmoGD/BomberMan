@@ -25,12 +25,12 @@ namespace BomberMan {
     public die(): void {
       this.map.data[this.pos.x][this.pos.y] = 0;
       this.mat.material = this.map.getGrasMaterial();
-      setTimeout(this.respawn.bind(this), Data.boxRespawnTime);
+      setTimeout(this.respawn.bind(this), data.boxRespawnTime);
     }
 
     private respawn(): void {
       if (this.map.data[this.pos.x][this.pos.y] != 0) {
-        setTimeout(this.respawn.bind(this), Data.boxRespawnTime);
+        setTimeout(this.respawn.bind(this), data.boxRespawnTime);
         return;
       }
       this.map.data[this.pos.x][this.pos.y] = 2;

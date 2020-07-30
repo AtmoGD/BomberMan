@@ -4,9 +4,19 @@ namespace BomberMan {
     private lives: number = 3;
     private score: number = 0;
 
+    private liveElement: HTMLSpanElement;
+    private scoreElement: HTMLSpanElement;
+    private endScoreElement: HTMLSpanElement;
+
     constructor(_map: Map, _gameManager: GameManager, _name?: string) {
-      super(_map, _gameManager, 3, _name ? _name : "BomberMan");
+      super(_map, _gameManager, 4, data.playerStartLevel, data.playerMaxLevel,_name ? _name : "BomberMan");
+      this.lives = data.playerStartLives;
+      this.speed *= 2;
       this.initKeyEvent();
+      this.liveElement = document.querySelector("#lives");
+      this.liveElement.innerText = this.lives.toString();
+      this.scoreElement = document.querySelector("#score");
+      this.endScoreElement = document.querySelector("#endScore");
     }
 
     private initKeyEvent(): void {
@@ -33,9 +43,34 @@ namespace BomberMan {
       }
     }
 
-    // protected move(): void {
-    //   this.show(ACTION.IDLE, this.dir);
-    // }
+    public takeScore(_amount: number): void {
+      this.score += _amount;
+
+      if (this.scoreElement)
+        this.scoreElement.innerText = this.score.toString();
+    }
+
+    public getScore(): number {
+      return this.score;
+    }
+
+    public die(): void {
+      this.lives--;
+      this.gameManager.playMusic(audioLoseLife, false);
+      
+      if (this.liveElement)
+        this.liveElement.innerText = this.lives.toString();
+      
+      if (this.endScoreElement)
+        this.endScoreElement.innerText = this.score.toString();
+
+      if (this.lives <= 0) {
+        setTimeout(()=> {
+          let gameOver: CustomEvent = new CustomEvent("gameOver", {bubbles: true});
+          this.dispatchEvent(gameOver);
+        }, 100);
+      }
+    }
 
     public static generateSprites(_coat: ƒ.CoatTextured): void {
       BomberMan.animations = {};

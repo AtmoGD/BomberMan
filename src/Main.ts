@@ -4,14 +4,22 @@ namespace BomberMan {
 
   window.addEventListener("load", handleLoad);
 
-  function handleLoad(): void {
+  export let audioBackground: ƒ.Audio;
+  export let audioWalk: ƒ.Audio;
+  export let audioExplosion: ƒ.Audio;
+  export let audioDie: ƒ.Audio;
+  export let audioButtonClick: ƒ.Audio;
+  export let audioLoseLife: ƒ.Audio;
+
+  async function handleLoad(): Promise<void> {
     let path: string = window.location.pathname;
     let page: string | undefined = path.split("/").pop();
     if (!page) {
       initStartScreen();
       return;
     }
-    console.log(page);
+
+    await loadMusic();
 
     switch (page) {
       case "index.html":
@@ -25,5 +33,14 @@ namespace BomberMan {
       default:
         return;
     }
+  }
+
+  async function loadMusic(): Promise<void> {
+    audioButtonClick = await ƒ.Audio.load("../Assets/Sounds/Click.wav");
+    audioBackground = await ƒ.Audio.load("../assets/Sounds/Background.mp3");
+    audioExplosion = await ƒ.Audio.load("../Assets/Sounds/Explosion.wav");
+    audioLoseLife = await ƒ.Audio.load("../Assets/Sounds/Hurt.wav");
+    audioWalk = await ƒ.Audio.load("../Assets/Sounds/Walk.wav");
+    audioDie = await ƒ.Audio.load("../Assets/Sounds/GameOver.wav");
   }
 }

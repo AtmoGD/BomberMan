@@ -4,14 +4,14 @@ var BomberMan;
     BomberMan.ƒ = FudgeCore;
     BomberMan.ƒAid = FudgeAid;
     window.addEventListener("load", handleLoad);
-    function handleLoad() {
+    async function handleLoad() {
         let path = window.location.pathname;
         let page = path.split("/").pop();
         if (!page) {
             BomberMan.initStartScreen();
             return;
         }
-        console.log(page);
+        await loadMusic();
         switch (page) {
             case "index.html":
             case "":
@@ -24,6 +24,14 @@ var BomberMan;
             default:
                 return;
         }
+    }
+    async function loadMusic() {
+        BomberMan.audioButtonClick = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Click.wav");
+        BomberMan.audioBackground = await BomberMan.ƒ.Audio.load("../assets/Sounds/Background.mp3");
+        BomberMan.audioExplosion = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Explosion.wav");
+        BomberMan.audioLoseLife = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Hurt.wav");
+        BomberMan.audioWalk = await BomberMan.ƒ.Audio.load("../Assets/Sounds/Walk.wav");
+        BomberMan.audioDie = await BomberMan.ƒ.Audio.load("../Assets/Sounds/GameOver.wav");
     }
 })(BomberMan || (BomberMan = {}));
 ///<reference path="Main.ts"/>
@@ -43,7 +51,7 @@ var BomberMan;
             this.addComponent(new BomberMan.ƒ.ComponentTransform());
             let pos = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
             this.mtxLocal.translation = pos;
-            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 0.1));
             this.map.data[this.position.y][this.position.x] = this.type;
             this.setAnimation(this.animations["Explode"]);
             setTimeout(this.explode.bind(this), this.lifetime);
@@ -58,6 +66,7 @@ var BomberMan;
             this.gameManager.graph.appendChild(left);
             let right = new BomberMan.Explosion(this.gameManager, this.map, this.position, BomberMan.DIRECTION.RIGHT, this.level);
             this.gameManager.graph.appendChild(right);
+            this.gameManager.playMusic(BomberMan.audioExplosion, false);
             this.gameManager.graph.removeChild(this);
         }
         generateAnimations() {
@@ -111,29 +120,57 @@ var BomberMan;
         DIRECTION[DIRECTION["DOWN"] = 3] = "DOWN";
     })(DIRECTION = BomberMan.DIRECTION || (BomberMan.DIRECTION = {}));
     class Man extends BomberMan.ƒAid.NodeSprite {
-        constructor(_map, _gameManager, _type, _name) {
+        constructor(_map, _gameManager, _type, _level, _maxLevel, _name) {
             super(_name ? _name : "Man");
-            this.bombLevel = 3;
-            this.bombSpeed = 1;
+            this.maxLevel = 1;
+            this.bombLevel = 1;
+            this.bombSpeed = 3;
+            this.speed = 2;
             this.canBomb = true;
+            this.dead = false;
             this.position = BomberMan.ƒ.Vector2.ZERO();
-            this.speed = 4;
             this.direc = DIRECTION.DOWN;
             this.distance = 0;
             this.map = _map;
             this.type = _type;
             this.gameManager = _gameManager;
-            this.position = this.map.createSpawnPoint(this.type);
+            this.maxLevel = _maxLevel;
+            this.position = this.map.getRandomSpawnPoint(this.type);
+            for (let i = 0; i < _level - this.bombLevel; i++) {
+                this.upgrade();
+            }
             this.transform = new BomberMan.ƒ.ComponentTransform();
             this.addComponent(this.transform);
             this.transform.local.translation = this.mtxLocal.translation = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
-            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 0.1));
+            this.addEventListener("upgrade", this.upgrade.bind(this), true);
             this.show(ACTION.IDLE, DIRECTION.DOWN);
             BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update.bind(this));
         }
         update() {
+            if (this.dead)
+                return;
+            this.movement();
+        }
+        upgrade() {
+            if (this.bombLevel >= this.maxLevel)
+                return;
+            this.bombLevel++;
+            this.bombSpeed *= 0.9;
+            this.speed *= 1.1;
+        }
+        generateSprites() {
+            console.log("generateSprites");
+        }
+        die() {
+            console.log("Wants to die");
+        }
+        getPosition() {
+            return this.position.copy;
+        }
+        movement() {
             if (this.distance > 0) {
-                let dist = (1 / BomberMan.Data.fps) * this.speed;
+                let dist = (1 / BomberMan.data.fps) * this.speed;
                 dist = dist > this.distance ? this.distance : dist;
                 switch (this.direc) {
                     case DIRECTION.UP:
@@ -152,18 +189,14 @@ var BomberMan;
                 this.distance -= dist;
             }
             else {
+                this.gameManager.stopMusic(BomberMan.audioWalk);
                 this.show(ACTION.IDLE, this.direc);
             }
-        }
-        generateSprites() {
-            console.log("generateSprites");
-        }
-        die() {
-            console.log("Wants to die");
         }
         move(_dir) {
             if (this.distance > 0)
                 return;
+            this.gameManager.playMusic(BomberMan.audioWalk, true);
             let newPos = this.position.getMutator();
             switch (_dir) {
                 case DIRECTION.UP:
@@ -176,7 +209,7 @@ var BomberMan;
                     break;
             }
             let mapData = this.map.data[newPos.y][newPos.x];
-            if (mapData == 1 || mapData == 2 || mapData == 3)
+            if (mapData != 0)
                 return;
             this.map.data[this.position.y][this.position.x] = 0;
             this.position.mutate(newPos);
@@ -186,7 +219,8 @@ var BomberMan;
             this.show(ACTION.WALK, this.direc);
         }
         placeBomb() {
-            console.log("Want to place a bomb");
+            if (!this.canBomb)
+                return;
             let bombPos = this.position.copy;
             switch (this.direc) {
                 case DIRECTION.UP:
@@ -203,6 +237,8 @@ var BomberMan;
                 return;
             let bomb = new BomberMan.Bomb(this.map, this.gameManager, bombPos, this.bombLevel);
             this.gameManager.graph.appendChild(bomb);
+            this.canBomb = false;
+            setTimeout(() => { this.canBomb = true; }, this.bombSpeed * 1000);
         }
         show(_action, _direction) {
             this.setAnimation(Man.animations[_action + _direction]);
@@ -216,10 +252,16 @@ var BomberMan;
 (function (BomberMan_1) {
     class BomberMan extends BomberMan_1.Man {
         constructor(_map, _gameManager, _name) {
-            super(_map, _gameManager, 3, _name ? _name : "BomberMan");
+            super(_map, _gameManager, 4, BomberMan_1.data.playerStartLevel, BomberMan_1.data.playerMaxLevel, _name ? _name : "BomberMan");
             this.lives = 3;
             this.score = 0;
+            this.lives = BomberMan_1.data.playerStartLives;
+            this.speed *= 2;
             this.initKeyEvent();
+            this.liveElement = document.querySelector("#lives");
+            this.liveElement.innerText = this.lives.toString();
+            this.scoreElement = document.querySelector("#score");
+            this.endScoreElement = document.querySelector("#endScore");
         }
         initKeyEvent() {
             window.addEventListener("keypress", this.handleKeyPress.bind(this));
@@ -243,9 +285,28 @@ var BomberMan;
                     break;
             }
         }
-        // protected move(): void {
-        //   this.show(ACTION.IDLE, this.dir);
-        // }
+        takeScore(_amount) {
+            this.score += _amount;
+            if (this.scoreElement)
+                this.scoreElement.innerText = this.score.toString();
+        }
+        getScore() {
+            return this.score;
+        }
+        die() {
+            this.lives--;
+            this.gameManager.playMusic(BomberMan_1.audioLoseLife, false);
+            if (this.liveElement)
+                this.liveElement.innerText = this.lives.toString();
+            if (this.endScoreElement)
+                this.endScoreElement.innerText = this.score.toString();
+            if (this.lives <= 0) {
+                setTimeout(() => {
+                    let gameOver = new CustomEvent("gameOver", { bubbles: true });
+                    this.dispatchEvent(gameOver);
+                }, 100);
+            }
+        }
         static generateSprites(_coat) {
             BomberMan.animations = {};
             let sprite = new BomberMan_1.ƒAid.SpriteSheetAnimation(BomberMan_1.ACTION.IDLE + BomberMan_1.DIRECTION.UP, _coat);
@@ -306,11 +367,11 @@ var BomberMan;
         die() {
             this.map.data[this.pos.x][this.pos.y] = 0;
             this.mat.material = this.map.getGrasMaterial();
-            setTimeout(this.respawn.bind(this), BomberMan.Data.boxRespawnTime);
+            setTimeout(this.respawn.bind(this), BomberMan.data.boxRespawnTime);
         }
         respawn() {
             if (this.map.data[this.pos.x][this.pos.y] != 0) {
-                setTimeout(this.respawn.bind(this), BomberMan.Data.boxRespawnTime);
+                setTimeout(this.respawn.bind(this), BomberMan.data.boxRespawnTime);
                 return;
             }
             this.map.data[this.pos.x][this.pos.y] = 2;
@@ -321,20 +382,99 @@ var BomberMan;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
-    BomberMan.Data = {
-        cameraDistance: 40,
-        loopMode: BomberMan.ƒ.LOOP_MODE.TIME_REAL,
-        fps: 30,
-        boxRespawnTime: 10000
-    };
-    BomberMan.firstMap = [
-        [1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1],
-    ];
+    class EnemyMan extends BomberMan.Man {
+        constructor(_map, _gameManager, _name) {
+            super(_map, _gameManager, 5, BomberMan.data.enemyStartLevel, BomberMan.data.enemyMaxLevel, _name ? _name : "BomberMan");
+            this.wait = false;
+            this.speed = BomberMan.data.enemySpeed;
+            this.bombSpeed = BomberMan.data.enemyBombSpeed;
+        }
+        update() {
+            if (this.dead)
+                return;
+            super.update();
+            if (this.distance == 0)
+                this.decideAction();
+        }
+        die() {
+            this.gameManager.bomberman.takeScore(this.bombLevel * 100);
+            this.dead = true;
+            this.map.data[this.position.y][this.position.x] = 0;
+            this.gameManager.graph.removeChild(this);
+            setTimeout(() => { this.gameManager.createEnemy(); }, 2000);
+        }
+        decideAction() {
+            if (this.wait)
+                return;
+            if (this.checkIfPlayerIsInRange())
+                this.placeBomb();
+            let rndDirection = Math.floor(Math.random() * 5);
+            switch (rndDirection) {
+                case 0:
+                    this.move(BomberMan.DIRECTION.UP);
+                    break;
+                case 1:
+                    this.move(BomberMan.DIRECTION.DOWN);
+                    break;
+                case 2:
+                    this.move(BomberMan.DIRECTION.LEFT);
+                    break;
+                case 3:
+                    this.move(BomberMan.DIRECTION.RIGHT);
+                    break;
+                case 4:
+                    this.wait = true;
+                    setTimeout(() => { this.wait = false; }, Math.random() * 1000);
+                    break;
+            }
+        }
+        checkIfPlayerIsInRange() {
+            let playerPosition = this.gameManager.bomberman.getPosition();
+            playerPosition.subtract(this.position);
+            if (playerPosition.magnitude < BomberMan.data.enemyRange)
+                return true;
+            return false;
+        }
+        static generateSprites(_coat) {
+            EnemyMan.animations = {};
+            let sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.UP, _coat);
+            let startRect = new BomberMan.ƒ.Rectangle(0, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.UP] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.DOWN, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(16, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.DOWN] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.LEFT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(208, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.LEFT] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.IDLE + BomberMan.DIRECTION.RIGHT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(64, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 1, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.IDLE + BomberMan.DIRECTION.RIGHT] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.UP, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(128, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 2, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.UP] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.DOWN, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(32, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 2, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.DOWN] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.LEFT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(160, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.LEFT] = sprite;
+            sprite = new BomberMan.ƒAid.SpriteSheetAnimation(BomberMan.ACTION.WALK + BomberMan.DIRECTION.RIGHT, _coat);
+            startRect = new BomberMan.ƒ.Rectangle(80, -64, 16, 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            sprite.generateByGrid(startRect, 3, BomberMan.ƒ.Vector2.ZERO(), 16, BomberMan.ƒ.ORIGIN2D.BOTTOMLEFT);
+            EnemyMan.animations[BomberMan.ACTION.WALK + BomberMan.DIRECTION.RIGHT] = sprite;
+        }
+        show(_action, _direction) {
+            this.setAnimation(EnemyMan.animations[_action + _direction]);
+        }
+    }
+    BomberMan.EnemyMan = EnemyMan;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
@@ -350,7 +490,7 @@ var BomberMan;
             this.addComponent(new BomberMan.ƒ.ComponentTransform());
             let pos = this.map.mapElements[this.position.y][this.position.x].mtxLocal.translation;
             this.mtxLocal.translation = pos;
-            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 1));
+            this.mtxLocal.translate(new BomberMan.ƒ.Vector3(-0.5, -0.5, 0.1));
             this.setAnimation(Explosion.animations["Explosion"]);
             setTimeout(this.breed.bind(this), 100);
             setTimeout(this.die.bind(this), 1000);
@@ -360,11 +500,13 @@ var BomberMan;
                     this.map.destroyBox(this.position);
                     this.end = true;
                     break;
-                case 3:
+                case 4:
                     this.gameManager.bomberman.die();
                     this.end = true;
                     break;
-                case 4:
+                case 5:
+                    let enemy = this.gameManager.getEnemy(this.position);
+                    enemy.die();
                     break;
             }
         }
@@ -419,51 +561,77 @@ var BomberMan;
     let viewport;
     let graph;
     let gameManager;
+    let canvas;
     let startOverlay;
     let gameOverlay;
     let gameOverOverlay;
     let startButton;
+    let playAgainButton;
     // ƒ.RenderManager.initialize(true, true);
-    function initGame() {
-        console.log("here");
+    async function initGame() {
         getReferences();
         installEventListener();
+        await loadData();
         camera = new BomberMan.ƒ.ComponentCamera();
-        camera.pivot.translateZ(BomberMan.Data.cameraDistance);
+        camera.pivot.translate(new BomberMan.ƒ.Vector3(-0.5, 1, BomberMan.data.cameraDistance));
         camera.pivot.rotateY(180);
-        let cameraLookAt = new BomberMan.ƒ.Vector3(1, 1, 0);
-        camera.pivot.lookAt(cameraLookAt);
+        //let cameraLookAt: ƒ.Vector3 = new ƒ.Vector3(1, 1, 0);
+        //camera.pivot.lookAt(cameraLookAt);
         graph = new BomberMan.ƒ.Node("Graph");
-        const canvas = document.querySelector("canvas");
+        canvas = document.querySelector("canvas");
         viewport = new BomberMan.ƒ.Viewport();
         viewport.initialize("Viewport", graph, camera, canvas);
         gameManager = new BomberMan.GameManager(viewport, graph, camera);
         viewport.draw();
-        let gizmo = new BomberMan.ƒAid.NodeCoordinateSystem("ControlSystem");
-        graph.addChild(gizmo);
         BomberMan.ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        BomberMan.ƒ.Loop.start(BomberMan.Data.loopMode, BomberMan.Data.fps);
+        BomberMan.ƒ.Loop.start(BomberMan.ƒ.LOOP_MODE.TIME_REAL, BomberMan.data.fps);
     }
     BomberMan.initGame = initGame;
     function update() {
         viewport.draw();
+    }
+    async function loadData() {
+        let rawData = await fetch("../src/Data.json");
+        BomberMan.data = JSON.parse(await rawData.text());
     }
     function getReferences() {
         startOverlay = document.querySelector("#startOverlay");
         gameOverlay = document.querySelector("#gameOverlay");
         gameOverOverlay = document.querySelector("#gameOverOverlay");
         startButton = document.querySelector("#startButton");
+        playAgainButton = document.querySelector("#playAgain");
     }
     function installEventListener() {
         startButton.addEventListener("click", startGame);
+        playAgainButton.addEventListener("click", () => { window.location.reload(); });
+        window.addEventListener("resize", updateGUI);
+    }
+    function updateGUI() {
+        gameOverlay.style.width = canvas.width.toString() + "px";
+        gameOverlay.style.height = canvas.height.toString() + "px";
+        gameOverOverlay.style.width = canvas.width.toString() + "px";
+        gameOverOverlay.style.height = canvas.height.toString() + "px";
     }
     function startGame() {
         startOverlay.style.display = "none";
-        gameOverlay.style.display = "flex";
         gameOverOverlay.style.display = "none";
+        gameOverlay.style.display = "flex";
+        gameOverlay.style.width = canvas.width.toString() + "px";
+        gameOverlay.style.height = canvas.height.toString() + "px";
+        gameOverOverlay.style.width = canvas.width.toString() + "px";
+        gameOverOverlay.style.height = canvas.height.toString() + "px";
         gameManager.startGame();
+        gameManager.playMusic(BomberMan.audioButtonClick, false);
         viewport.draw();
     }
+    function endGame() {
+        gameManager.stopMusic(BomberMan.audioBackground);
+        gameManager.playMusic(BomberMan.audioDie, false);
+        startOverlay.style.display = "none";
+        gameOverOverlay.style.display = "flex";
+        gameOverlay.style.display = "none";
+    }
+    BomberMan.endGame = endGame;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
@@ -471,44 +639,47 @@ var BomberMan;
         constructor(_viewport, _graph, _camera) {
             this.map = null;
             this.mans = [];
-            this.destroyables = [];
             this.bomberman = null;
-            this.gameOver = false;
+            this.enemys = [];
             this.viewport = _viewport;
             this.graph = _graph;
             this.camera = _camera;
+            this.upgrade = new CustomEvent("upgrade", { bubbles: true });
         }
         startGame() {
             BomberMan.Map.loadImages();
-            this.map = BomberMan.MapGenerator.generateRandomMap(21);
-            this.graph.appendChild(this.map);
             this.loadSprites();
+            this.playMusic(BomberMan.audioBackground, true);
+            this.map = BomberMan.MapGenerator.generateRandomMap(BomberMan.data.mapSize);
             this.bomberman = new BomberMan.BomberMan(this.map, this, "Bomberman");
+            for (let i = 0; i < BomberMan.data.enemyCount; i++) {
+                this.createEnemy();
+            }
+            this.graph.appendChild(this.map);
             this.graph.appendChild(this.bomberman);
-        }
-        checkCollisionAll(_target) {
-            let restDest = this.checkCollisionDestroyables(_target);
-            let restMan = this.checkCollisionMans(_target);
-            return restDest ? restDest : restMan;
-        }
-        checkCollisionDestroyables(_pos) {
-            for (let dest of this.destroyables) {
-                if (dest.mtxLocal.translation.isInsideSphere(_pos, 1)) {
-                    return dest;
-                }
-            }
-            return null;
-        }
-        checkCollisionMans(_pos) {
-            for (let man of this.mans) {
-                if (man.mtxLocal.translation.isInsideSphere(_pos, 1)) {
-                    return man;
-                }
-            }
-            return null;
+            this.graph.addEventListener("gameOver", () => {
+                BomberMan.ƒ.Loop.stop();
+                BomberMan.endGame();
+            });
+            setInterval(() => {
+                this.graph.broadcastEvent(this.upgrade);
+            }, BomberMan.data.upgradeSpeed);
         }
         getMap() {
             return this.map;
+        }
+        createEnemy() {
+            let newEnemy = new BomberMan.EnemyMan(this.map, this, "EnemyMan");
+            this.enemys.push(newEnemy);
+            this.graph.appendChild(newEnemy);
+        }
+        getEnemy(_position) {
+            for (let enemy of this.enemys) {
+                let enemyPos = enemy.getPosition();
+                if (_position.x == enemyPos.x && _position.y == enemyPos.y)
+                    return enemy;
+            }
+            return null;
         }
         loadSprites() {
             let img = document.querySelector("#spritesheet");
@@ -516,8 +687,25 @@ var BomberMan;
             coat.texture = new BomberMan.ƒ.TextureImage();
             coat.texture.image = img;
             BomberMan.BomberMan.generateSprites(coat);
+            BomberMan.EnemyMan.generateSprites(coat);
             BomberMan.Bomb.takeCoat(coat);
             BomberMan.Explosion.generateSprites(coat);
+        }
+        playMusic(_music, _loop) {
+            let cmpAudio = new BomberMan.ƒ.ComponentAudio(_music, _loop, true);
+            let volume = +BomberMan.getCookie("volume");
+            if (volume)
+                cmpAudio.volume = _loop ? volume : volume / 2;
+            this.graph.addComponent(cmpAudio);
+            BomberMan.ƒ.AudioManager.default.listenTo(this.graph);
+        }
+        stopMusic(_music) {
+            let coms = this.graph.getComponents(BomberMan.ƒ.ComponentAudio);
+            coms.forEach(element => {
+                if (element.audio == _music) {
+                    this.graph.removeComponent(element);
+                }
+            });
         }
     }
     BomberMan.GameManager = GameManager;
@@ -570,6 +758,16 @@ var BomberMan;
                 this.mapElements[_y][_x] = tile;
             }
         }
+        getRandomSpawnPoint(_type) {
+            let x = Math.floor(Math.random() * this.data[0].length);
+            let y = Math.floor(Math.random() * this.data.length);
+            if (this.data[y][x] == 0) {
+                this.data[y][x] = _type;
+                return new BomberMan.ƒ.Vector2(x, y);
+            }
+            else
+                return this.getRandomSpawnPoint(_type);
+        }
         createSpawnPoint(_type) {
             for (let y = 0; y < this.data.length; y++) {
                 for (let x = 0; x < this.data[y].length; x++) {
@@ -613,26 +811,60 @@ var BomberMan;
         getBoxMaterial() {
             return BomberMan.getTextureMaterial("Box", Map.boxImg);
         }
-        respawnBox(_pos) {
-        }
-        createWallSide() {
-            let floor = new BomberMan.ƒ.Node("Floor");
-            return floor;
-        }
     }
     BomberMan.Map = Map;
 })(BomberMan || (BomberMan = {}));
 var BomberMan;
 (function (BomberMan) {
     class MapGenerator {
-        static generateRandomMap(_size) {
+        static generateRandomMap(_size, _mode) {
             if (!_size)
                 _size = Math.floor((Math.random() * 5) + 5);
-            let mode = Math.floor(Math.random() * 1);
+            let mode = _mode;
+            if (!mode)
+                mode = Math.floor(Math.random() * 3);
             switch (mode) {
+                case 0:
+                //return new Map(this.randomGrid(_size));
+                case 1:
+                //return new Map(this.randomCross(_size));
                 default:
-                    return new BomberMan.Map(this.randomGrid(_size));
+                    return new BomberMan.Map(this.standardMap(_size));
             }
+        }
+        static standardMap(_size) {
+            let _data = [];
+            for (let i = 0; i < _size; i++)
+                _data[i] = [];
+            for (let y = 0; y < _size; y++) {
+                for (let x = 0; x < _size; x++) {
+                    if (x == 0 || y == 0 || x == _size - 1 || y == _size - 1) {
+                        _data[y][x] = 1;
+                    }
+                    else {
+                        if (x % 2 == 0 && y % 2 == 0) {
+                            _data[y][x] = 1;
+                        }
+                        else {
+                            _data[y][x] = 0;
+                        }
+                    }
+                }
+            }
+            _data = MapGenerator.addBoxes(_data, _size);
+            return _data;
+        }
+        static addBoxes(_data, _count) {
+            let x = Math.floor(Math.random() * _data[0].length);
+            let y = Math.floor(Math.random() * _data.length);
+            if (_data[y][x] == 0) {
+                _data[y][x] = 2;
+                _count--;
+            }
+            if (_count <= 0)
+                return _data;
+            else
+                return MapGenerator.addBoxes(_data, _count);
         }
         static randomGrid(_size) {
             let _data = [];
@@ -645,7 +877,7 @@ var BomberMan;
                         _data[y][x] = 1;
                     }
                     else {
-                        if ((x % rndSize == 0) || y % rndSize == 0) {
+                        if (x % rndSize == 0 || y % rndSize == 0) {
                             _data[y][x] = 2;
                         }
                         else {
@@ -697,7 +929,7 @@ var BomberMan;
         volumeInput = document.querySelector("#volumeInput");
         if (volumeInput) {
             volumeInput.addEventListener("change", updateVolume);
-            let volume = BomberMan.getCookie("Volume");
+            let volume = BomberMan.getCookie("volume");
             if (volume != undefined) {
                 volumeInput.value = volume;
             }
@@ -705,14 +937,15 @@ var BomberMan;
     }
     BomberMan.initStartScreen = initStartScreen;
     function startGame() {
-        window.location.href = "./html/Game.html";
+        let audio = new Audio('../assets/Sounds/Click.wav');
+        audio.play();
+        setTimeout(() => { window.location.href = "./html/Game.html"; }, 1000);
     }
     function updateVolume() {
         let volume = volumeInput?.value;
         if (!volume)
             return;
-        BomberMan.setCookie("Volume", volume);
-        console.log(document.cookie);
+        BomberMan.setCookie("volume", volume);
     }
 })(BomberMan || (BomberMan = {}));
 var BomberMan;

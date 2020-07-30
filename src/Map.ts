@@ -61,6 +61,18 @@ namespace BomberMan {
       }
     }
 
+    public getRandomSpawnPoint(_type: number): ƒ.Vector2 {
+      let x: number = Math.floor(Math.random() * this.data[0].length);
+      let y: number = Math.floor(Math.random() * this.data.length);
+
+      if (this.data[y][x] == 0) {
+        this.data[y][x] = _type;
+        return new ƒ.Vector2(x, y);
+      }
+      else
+        return this.getRandomSpawnPoint(_type);
+    }
+
     public createSpawnPoint(_type: number): ƒ.Vector2 {
       for (let y: number = 0; y < this.data.length; y++) {
         for (let x: number = 0; x < this.data[y].length; x++) {
@@ -116,15 +128,6 @@ namespace BomberMan {
 
     public getBoxMaterial(): ƒ.Material {
       return getTextureMaterial("Box", Map.boxImg);
-    }
-
-    public respawnBox(_pos: ƒAid.Node): void {
-
-    }
-
-    private createWallSide(): ƒ.Node {
-      let floor: ƒ.Node = new ƒ.Node("Floor");
-      return floor;
     }
   }
 }

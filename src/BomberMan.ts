@@ -10,7 +10,7 @@ namespace BomberMan {
     }
 
     private initKeyEvent(): void {
-      window.addEventListener("keydown", this.handleKeyPress.bind(this));
+      window.addEventListener("keypress", this.handleKeyPress.bind(this));
     }
 
     private handleKeyPress(_event: KeyboardEvent): void {

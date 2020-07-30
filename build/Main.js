@@ -222,7 +222,7 @@ var BomberMan;
             this.initKeyEvent();
         }
         initKeyEvent() {
-            window.addEventListener("keydown", this.handleKeyPress.bind(this));
+            window.addEventListener("keypress", this.handleKeyPress.bind(this));
         }
         handleKeyPress(_event) {
             switch (_event.code) {

@@ -41,7 +41,6 @@ namespace BomberMan {
       ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.update.bind(this));
     }
 
-
     public update(): void {
 
       if (this.distance > 0) {

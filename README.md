@@ -5,7 +5,7 @@
 
 [Link to the designdocument](./Concept/Designdokument.pdf)
 
-[Download the project as .zip](./BomberMan.zip)
+[Download the project as .zip](https://github.com/AionixX/BomberMan/raw/master/BomberMan.zip)
 
 ## Idea
 I want to make a *Bomber Man* clone.

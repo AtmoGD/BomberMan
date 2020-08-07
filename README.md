@@ -1,8 +1,10 @@
 # Bomber Man
 
-[Link zum Spiel](https://aionixx.github.io/BomberMan/)
+[Link to the Game](https://aionixx.github.io/BomberMan/)
 
-[Link zum Repository](https://github.com/AionixX/BomberMan/)
+[Link to the repository](https://github.com/AionixX/BomberMan/)
+
+[Link to the designdocument](./concept/Designdokument.pdf)
 
 ## Idea
 I want to make a **Bomber Man** clone.

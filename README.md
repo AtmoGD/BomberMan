@@ -16,9 +16,12 @@ Enemys will try to kill the player with their bombs if the player gets in range.
 If the Player kills an enemy, the player will gain score and a new enemy will be spawned.
 The game is over once the player has lost all his three lives.
 
-### Controlling
+## Controlling
 You can controll the player with the `W` `A` `S` `D` buttons on your keyboard for the movement and with `Space` to place a Bomb.
 
+## Installing and interaction
+To run this game locally, you just have to clone the repository and run `npx`. 
+The interction is pretty easy. Just click on the start buttons and have fun!
 
 ## Checkliste für Leistungsnachweis
 © Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl, HFU

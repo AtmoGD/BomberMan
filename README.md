@@ -5,11 +5,9 @@
 ## Idea
 I want to make a **Bomber Man** clone.
 
-The Player starts on a map whith randomly generated Boxes. These Boxes are destroyable with the bombs the player can place.
+The Player starts on a map whith randomly generated Boxes, and enemys. These Boxes are destroyable with the bombs the player can place.
 
-The map also generates enemys and power-ups. 
-
-Enemys will try to kill the player with their bombs and power-ups will cause that the player can place bombs faster or the placed bombs has a higher kill range. Also there can spawn live power-ups. They will add a live to the player.
+Enemys will try to kill the player with their bombs if the player gets in range.
 
 If the Player kills an enemy, the player will gain score and a new enemy will be spawned.
 The game is over once the player has lost all his three lives.
@@ -17,17 +15,6 @@ The game is over once the player has lost all his three lives.
 ### Controlling
 You can controll the player with the `W` `A` `S` `D` buttons on your keyboard for the movement and with `Space` to place a Bomb.
 
-## UI Scribble
-![Scribble](./Concept/Scribble.jpg "UI Scribble")
-
-## Use-case diagramm
- ![Use Case](./Concept/UseCase.jpg "Use-case diagramm")
-
-## Class-diagramm
-![Class Diagram](./Concept/BomberManClassDiagram.svg "Class diagram")
-
-## Activity-diagramm
-![Activity Diagram](./Concept/BomberManActivityDiagram.svg "Activity diagram")
 
 ## Checkliste für Leistungsnachweis
 © Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl, HFU
@@ -37,17 +24,17 @@ You can controll the player with the `W` `A` `S` `D` buttons on your keyboard fo
 |    | Titel                 | Bomber Man
 |    | Name                  | Dennis Hawran
 |    | Matrikelnummer        | 262357
-|  1 | Nutzerinteraktion     | Der Nutzer kann mit der Applikation interagieren. Mit welchen Mitteln und welchen Aktionen werden welche Reaktionen ausgelöst? ->The User can start the game with the mouse aswell he can controll some settings whith it. In the game itself he controlls the player with the `W` `A` `S` `D` and `Space` buttons to move around and place bombs. |
-|  2 | Objektinteraktion     | Mit Hilfe von Kollisionsprüfung interagieren Objekte miteinander. Wann passiert dabei wie was?-> Due to the collision checking, the player can't move through walls, boxes or bombs. Also the bombs use the collision checking to determine which boxes and players they hit to tell them to die.|
-|  3 | Objektanzahl variabel | Eine variable Anzahl von Objekten wird zur Laufzeit generiert. Welche sind dies und wann und wie geschieht die Erzeugung?-> When the user starts the game, a random generated map gets initialized. the amount of boxes aswell as there position is variable. On runtime|
-|  4 | Szenenhierarchie      | Die Szenenhierarchie ist sinnvoll aufgebaut. Wer ist wessen Parent, wie sind Elemente in anderen gruppiert und warum?                                                                                                                                                          |
-|  5 | Sound                 | Sounds sind eingebunden und unterstützen oder ermöglichen die Wahrnehmung der Aktionen. Welche Ereignisse werden durch Geräusche akustisch unterstützt, und durch welche Geräuschkulisse oder Musik die Atmosphäre?                                                            |
-|  6 | GUI                   | Ein grafisches Interface gibt dem Nutzer die Möglichkeit, Einstellungen beim Programmstart oder während des Programmlaufs vorzunehmen. Was kann er dort tun?                                                                                   |
-|  7 | Externe Daten         | Spielparameter sind extern in einer Datei veränderbar, so dass das Spiel nur neu gestartet, aber nicht neu kompiliert werden muss. Welche Parameter sind dies und was sind die Auswirkungen?                                                                                   |
-|  8 | Verhaltensklassen     | Das Verhalten von Objekten ist in den Methoden von Klassen definiert, die in externen Dateien abgelegt sind. Welche Klassen sind dies und welches Verhalten wird dort beschrieben?                                                                                             |
-|  9 | Subklassen            | Es existiert eine Klassenhierarchie, einige Objekte sind Instanzen von einer oder mehreren abgeleiteten Subklassen mit gegenüber den anderen Objekten speziellem Verhalten und besonderen Eigenschaften. Welche Klassen sind dies und welches Verhalten wird dort beschrieben? |
-| 10 | Maße & Positionen     | Maße, Skala und Positionen sind gut durchdacht. Wie groß sind Spielfiguren, wie ist die Welt angeordnet bezogen auf den Ursprung, wie sind Spielelemente bezogen auf ihre lokalen Koordinatensysteme definiert?                                                                |
-| 11 | Event-System          | Das Event-System wird verwendet. Wer sendet wem Informationen oder Methodenaufrufe und wofür?                                                                                                                                                                                  |
+|  1 | Nutzerinteraktion     |The User can start the game with the mouse. In the game itself he controlls the player with the `W` `A` `S` `D` and `Space` buttons to move around and place bombs. |
+|  2 | Objektinteraktion     |Due to the collision checking, the player can't move through walls, boxes or bombs. Also the bombs use the collision checking to determine which boxes and players they hit to tell them to die.|
+|  3 | Objektanzahl variabel |When the user starts the game, a random generated map gets initialized. the amount of boxes aswell as there position is variable. On runtime the new enemys are getting spawned randomly across the map|
+|  4 | Szenenhierarchie      |The main parent is the Game.ts which starts the Game. Then there is a GameManager which holds all the game objects like the map, the player and the enemys.|
+|  5 | Sound                 |There is some backgrounsmusic for the atmosphere.There are sound to give the player feedback aswell like footsteps, explosion sounds and die sounds.|
+|  6 | GUI                   |The user can change the volume and start the game in the start screen.|
+|  7 | Externe Daten         |There are a lot of things to adjust in the Data.json like map size, camera distance, amount of enemys, start level of the player and enemys etc.|
+|  8 | Verhaltensklassen     |I have a few different classes with different behaviours. Some of them are `Bomb`, `Box`, `man`, `Explosion` or `Map`.|
+|  9 | Subklassen            |The classes `BomberMan` and `EnemyMan` extend the `Man` class. `Man` can do everything they need to do except care about the input. So `BomberMan`cares about the user input and `EnemyMan` is a small AI which tells his parent class what to do.|
+| 10 | Maße & Positionen     |Enemys and the player all have the size `1` aswell as each tile. The map is centered so the camerea just have to look at the world position `0, 0, 0`.|
+| 11 | Event-System          |The `GameManager` sends events to all instances and tell them to `upgrade`. Just classes which inherit from `Man` are using this event the increase their level.|
 
 ## Abgabeformat
 * Fasse die Konzeption als ein wohlformatiertes Designdokument in PDF zusammen!

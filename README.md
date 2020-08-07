@@ -4,7 +4,7 @@
 
 [Link to the repository](https://github.com/AionixX/BomberMan/)
 
-[Link to the designdocument](./concept/Designdokument.pdf)
+[Link to the designdocument](./Concept/Designdokument.pdf)
 
 ## Idea
 I want to make a **Bomber Man** clone.

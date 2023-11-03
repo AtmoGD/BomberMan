@@ -1,5 +1,5 @@
 # Bomber Man
-[Link to the Game](https://aionixx.github.io/BomberMan/)
+[Link to the Game](https://atmogd.github.io/BomberMan/)
 
 [Link to the repository](https://github.com/AionixX/BomberMan/)
 
